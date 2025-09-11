@@ -2,11 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Morning.Value.Application.Books.Services;
 using Morning.Value.Application.Common.Dtos;
+using Morning.Value.Application.Loans.Dtos;
+using Morning.Value.Application.Loans.Services;
+using Morning.Value.Domain.Loans.Enums;
 using Morning.Value.Web.Site.Books.Models;
 using Morning.Value.Web.Site.Home.Controllers;
-using Morning.Value.Web.Site.Loans;
-using Morning.Value.Web.Site.Loans.Enums;
-using Morning.Value.Web.Site.Loans.Models;
 using System.Security.Claims;
 
 namespace Morning.Value.Web.Site.Books.Controllers
@@ -15,19 +15,16 @@ namespace Morning.Value.Web.Site.Books.Controllers
     public class BooksController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly ILoanAppService _loanAppService;
         private readonly IBookAppService _bookAppService;
-        private readonly ILoanRepository _loans;
-        private readonly IBookRepository _books;
 
         public BooksController(ILogger<HomeController> logger,
-            IBookAppService bookAppService,
-            ILoanRepository loans,
-            IBookRepository books)
+            ILoanAppService loanAppService,
+            IBookAppService bookAppService)
         {
             _logger = logger;
+            _loanAppService = loanAppService;
             _bookAppService = bookAppService;
-            _loans = loans;
-            _books = books;
         }
 
         [Authorize(Roles = "Admin")]
@@ -61,10 +58,10 @@ namespace Morning.Value.Web.Site.Books.Controllers
                 _ => (LoanStatus?)null
             };
 
-            var result = await _loans.GetHistoryByUserAsync(userId, q, st, page, pageSize);
+            var result = await _loanAppService.GetHistoryByUserAsync(Guid.Parse(userId), q, st, page, pageSize);
 
             // Mantener filtros en la vista
-            result = new PagedResult<LoanHistoryItem>
+            result = new PagedResult<LoanHistoryItemResponse>
             {
                 Items = result.Items,
                 PageIndex = result.PageIndex,

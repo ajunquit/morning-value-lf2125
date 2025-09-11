@@ -1,12 +1,12 @@
 ﻿using Morning.Value.Application.Common.Dtos;
-using Morning.Value.Web.Site.Loans.Enums;
-using Morning.Value.Web.Site.Loans.Models;
+using Morning.Value.Application.Loans.Dtos;
+using Morning.Value.Domain.Loans.Enums;
 
 namespace Morning.Value.Web.Site.Loans
 {
     public interface ILoanRepository
     {
-        Task<PagedResult<LoanHistoryItem>> GetHistoryByUserAsync(
+        Task<PagedResult<LoanHistoryItemResponse>> GetHistoryByUserAsync(
             string userId,
             string? query,
             LoanStatus? status,

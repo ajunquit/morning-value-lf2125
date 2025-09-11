@@ -1,7 +1,9 @@
-﻿using Morning.Value.Application.Loans.Dtos;
+﻿using Morning.Value.Application.Common.Dtos;
+using Morning.Value.Application.Loans.Dtos;
 using Morning.Value.Domain.Common.Interfaces;
 using Morning.Value.Domain.Exceptions;
 using Morning.Value.Domain.Loans.Entity;
+using Morning.Value.Domain.Loans.Enums;
 
 namespace Morning.Value.Application.Loans.Services
 {
@@ -49,6 +51,35 @@ namespace Morning.Value.Application.Loans.Services
                 BookId = bookId,
                 RemainingCopies = book.AvailableCopies,
                 LoanDateUtc = loan.LoanDateUtc
+            };
+        }
+
+        public async Task<PagedResult<LoanHistoryItemResponse>> GetHistoryByUserAsync(Guid userId, string? query, LoanStatus? status, int page, int pageSize, CancellationToken ct = default)
+        {
+            if (page <= 0) page = 1;
+            if (pageSize <= 0) pageSize = 10;
+
+            var (items, total) = await _uow.LoanRepository.GetHistoryByUserAsync(userId, query, status, page, pageSize, ct);
+
+            var dtos = items.Select(x => new LoanHistoryItemResponse
+            {
+                LoanId = x.LoanId,
+                BookTitle = x.BookTitle,
+                Author = x.Author,
+                Genre = x.Genre,
+                LoanDate = x.LoanDateUtc,
+                ReturnDate = x.ReturnDateUtc,
+                Status = x.ReturnDateUtc.HasValue ? LoanStatus.Returned : LoanStatus.Borrowed
+            }).ToList();
+
+            return new PagedResult<LoanHistoryItemResponse>
+            {
+                Items = dtos,
+                PageIndex = page,
+                PageSize = pageSize,
+                TotalCount = total,
+                Query = query,
+                StatusFilter = status?.ToString()?.ToLower()
             };
         }
 

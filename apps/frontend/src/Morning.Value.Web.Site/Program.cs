@@ -40,10 +40,6 @@ builder.Services.
     AddApplicationServices(builder.Configuration).
     AddInfrastructureServices(builder.Configuration);
 
-builder.Services.AddScoped<ILoanRepository, InMemoryLoanRepository>();
-builder.Services.AddScoped<IBookRepository, BookRepository>();
-builder.Services.AddScoped<LibraryService>();
-
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddHttpContextAccessor();
 
