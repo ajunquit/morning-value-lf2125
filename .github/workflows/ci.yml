@@ -1,4 +1,4 @@
-name: ci
+name: CI
 
 on:
   push:
@@ -27,7 +27,6 @@ jobs:
     env:
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
-      # Cambia este prefijo si quieres filtrar assemblies en ReportGenerator
       COV_ASSEMBLY_FILTER: "+Morning.Value.*"
 
     steps:
@@ -39,9 +38,8 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
-      # Cache NuGet (independiente de setup-dotnet para poder ver cache-hit)
       - name: Cache NuGet packages
-        id: nuget-cache
+        id: cache_nuget
         uses: actions/cache@v4
         with:
           path: ~/.nuget/packages
@@ -50,77 +48,6 @@ jobs:
             ${{ runner.os }}-nuget-
 
       - name: Cache status
-        run: echo "NuGet cache hit: ${{ steps.nuget-cache.outputs.cache-hit }}"
-
-      - name: Restore
+        shell: bash
         run: |
-          # Si existe solución, úsala; si no, restaura desde raíz
-          sln=$(ls -1 **/*.sln 2>/dev/null | head -n 1 || true)
-          if [ -n "$sln" ]; then
-            echo "Restoring solution: $sln"
-            dotnet restore "$sln"
-          else
-            echo "No .sln found, restoring all projects"
-            dotnet restore
-          fi
-
-      - name: Build (Release)
-        run: |
-          sln=$(ls -1 **/*.sln 2>/dev/null | head -n 1 || true)
-          if [ -n "$sln" ]; then
-            dotnet build "$sln" -c Release --no-restore
-          else
-            dotnet build -c Release --no-restore
-          fi
-
-      - name: Test with coverage
-        run: |
-          set -e
-          mkdir -p TestResults
-          sln=$(ls -1 **/*.sln 2>/dev/null | head -n 1 || true)
-          if [ -n "$sln" ]; then
-            dotnet test "$sln" -c Release --no-build \
-              --collect:"XPlat Code Coverage" \
-              --logger "trx;LogFileName=test_results.trx"
-          else
-            # Ejecuta todos los proyectos *Tests/*.csproj
-            projs=$(git ls-files "*Tests/*.csproj" || true)
-            for p in $projs; do
-              echo "Testing $p"
-              dotnet test "$p" -c Release --no-build \
-                --collect:"XPlat Code Coverage" \
-                --logger "trx;LogFileName=$(basename $p)-results.trx"
-            done
-          fi
-
-      - name: Install ReportGenerator
-        run: dotnet tool install --global dotnet-reportgenerator-globaltool
-
-      - name: Create coverage report
-        run: |
-          export PATH="$PATH:$HOME/.dotnet/tools"
-          reportgenerator \
-            -reports:**/TestResults/**/coverage.cobertura.xml \
-            -targetdir:coverage \
-            -reporttypes:"HtmlInline;Cobertura;MarkdownSummary" \
-            -assemblyfilters:"${COV_ASSEMBLY_FILTER}"
-          echo "### Code Coverage Summary" >> $GITHUB_STEP_SUMMARY
-          cat coverage/Summary.md >> $GITHUB_STEP_SUMMARY
-
-      - name: Upload coverage artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-html
-          path: coverage
-          if-no-files-found: warn
-          retention-days: 7
-
-      - name: Upload test results (trx + coverage raw)
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results
-          path: |
-            **/TestResults/**/*.trx
-            **/TestResults/**/coverage.cobertura.xml
-          if-no-files-found: warn
-          retention-days: 7
+          echo "NuGet cache hit: ${{ steps.cache
