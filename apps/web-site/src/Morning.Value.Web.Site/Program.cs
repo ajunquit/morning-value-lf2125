@@ -1,7 +1,31 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// 1) Cookie Auth
+builder.Services
+    .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/auth/signin";
+        options.LogoutPath = "/auth/signout";
+        //options.AccessDeniedPath = "/auth/denied";
+        options.Cookie.Name = "mv.auth";
+        options.SlidingExpiration = true;
+        options.ExpireTimeSpan = TimeSpan.FromHours(8);
+    });
+
+// 2) Política global: TODO requiere estar autenticado
+builder.Services.AddAuthorization(options =>
+{
+    options.FallbackPolicy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+});
 
 var app = builder.Build();
 
@@ -18,10 +42,21 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+// *** Importante: primero Authentication, luego Authorization
+app.UseAuthentication();
 app.UseAuthorization();
 
+// Ruta explícita para la raíz "/"
+app.MapControllerRoute(
+    name: "root",
+    pattern: "",
+    defaults: new { controller = "Home", action = "Index" }
+);
+
+// Ruta por defecto del resto
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Auth}/{action=SignIn}/{id?}");
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
 
 app.Run();

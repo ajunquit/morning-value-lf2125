@@ -1,4 +1,7 @@
-﻿@{
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using Morning.Value.Web.Site.Auth.Models
+@model SignUpViewModel
+@{
     Layout = "_AuthLayout";
     ViewData["Title"] = "Sign Up";
 }
@@ -12,33 +15,30 @@
 
                 <form asp-controller="Auth" asp-action="SignUp" method="post" novalidate>
                     @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
 
                     <div class="mb-3">
-                        <label for="Name" class="form-label">Nombre <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="Name" name="Name"
-                               placeholder="Tu nombre completo" required />
-                        <div class="invalid-feedback">El nombre es obligatorio.</div>
+                        <label asp-for="Name" class="form-label"></label>
+                        <input asp-for="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
-                        <label for="Email" class="form-label">Correo <span class="text-danger">*</span></label>
-                        <input type="email" class="form-control" id="Email" name="Email"
-                               placeholder="nombre@dominio.com" required />
-                        <div class="invalid-feedback">Ingresa un correo válido.</div>
+                        <label asp-for="Email" class="form-label"></label>
+                        <input asp-for="Email" class="form-control" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
-                        <label for="Password" class="form-label">Contraseña <span class="text-danger">*</span></label>
-                        <input type="password" class="form-control" id="Password" name="Password"
-                               placeholder="••••••••" minlength="6" autocomplete="new-password" required />
-                        <div class="invalid-feedback">La contraseña debe tener al menos 6 caracteres.</div>
+                        <label asp-for="Password" class="form-label"></label>
+                        <input asp-for="Password" class="form-control" />
+                        <span asp-validation-for="Password" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
-                        <label for="ConfirmPassword" class="form-label">Confirmar contraseña <span class="text-danger">*</span></label>
-                        <input type="password" class="form-control" id="ConfirmPassword" name="ConfirmPassword"
-                               placeholder="Repite la contraseña" minlength="6" autocomplete="new-password" required />
-                        <div class="invalid-feedback">Las contraseñas no coinciden.</div>
+                        <label asp-for="ConfirmPassword" class="form-label"></label>
+                        <input asp-for="ConfirmPassword" class="form-control" />
+                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                     </div>
 
                     <button type="submit" class="btn btn-primary w-100 py-2">Crear cuenta</button>
@@ -54,46 +54,5 @@
 </div>
 
 @section Scripts {
-    <script>
-        // Validación Bootstrap + reglas: email requerido, password >= 6, confirmación igual
-        (function () {
-          'use strict';
-          const form = document.querySelector('form');
-          const email = document.getElementById('Email');
-          const pwd = document.getElementById('Password');
-          const cpwd = document.getElementById('ConfirmPassword');
-          const MIN = 6;
-
-          function validateEmail() {
-            const ok = email.value.trim() !== '';
-            email.setCustomValidity(ok ? '' : 'El correo es obligatorio.');
-            return ok;
-          }
-
-          function validatePassword() {
-            const ok = (pwd.value.length >= MIN);
-            pwd.setCustomValidity(ok ? '' : `Mínimo ${MIN} caracteres.`);
-            return ok;
-          }
-
-          function validateConfirm() {
-            const ok = (cpwd.value.length >= MIN) && (cpwd.value === pwd.value);
-            cpwd.setCustomValidity(ok ? '' : 'Las contraseñas no coinciden.');
-            return ok;
-          }
-
-          email.addEventListener('input', validateEmail);
-          pwd.addEventListener('input', () => { validatePassword(); validateConfirm(); });
-          cpwd.addEventListener('input', validateConfirm);
-
-          form.addEventListener('submit', function (event) {
-            const ok = validateEmail() & validatePassword() & validateConfirm();
-            if (!form.checkValidity() || !ok) {
-              event.preventDefault();
-              event.stopPropagation();
-            }
-            form.classList.add('was-validated');
-          }, false);
-        })();
-    </script>
+    <partial name="_ValidationScriptsPartial" />
 }

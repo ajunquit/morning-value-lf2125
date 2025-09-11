@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Morning.Value.Web.Site.Controllers;
 
 namespace Morning.Value.Web.Site.Books.Controllers
 {
+    [Authorize]
     public class BooksController : Controller
     {
         private readonly ILogger<HomeController> _logger;
