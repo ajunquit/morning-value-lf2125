@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Morning.Value.Web.Site.Books;
+using Morning.Value.Web.Site.Loans;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +31,11 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("AdminOnly", p => p.RequireRole("Admin"));
     options.AddPolicy("ReaderOnly", p => p.RequireRole("Reader"));
 });
+
+builder.Services.AddScoped<ILoanRepository, InMemoryLoanRepository>();
+builder.Services.AddScoped<IBookRepository, BookRepository>();
+builder.Services.AddScoped<LibraryService>();
+
 
 var app = builder.Build();
 

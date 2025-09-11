@@ -1,0 +1,19 @@
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Morning.Value.Web.Site.Books.Models
+{
+    public class BookCreateViewModel
+    {
+        [Required, StringLength(150)]
+        public string Title { get; set; } = "";
+
+        [Required, StringLength(120)]
+        public string Author { get; set; } = "";
+
+        [Required, StringLength(60)]
+        public string Genre { get; set; } = "";
+
+        [Range(0, int.MaxValue, ErrorMessage = "Debe ser >= 0")]
+        public int AvailableCopies { get; set; }
+    }
+}

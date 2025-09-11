@@ -1,9 +1,91 @@
-﻿@{
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using Morning.Value.Web.Site.Books.Models
+@model BookCreateViewModel
+
+@{
     ViewData["Title"] = "Book Management";
     Layout = "_Layout";
+    bool openCreate = (bool?)ViewData["OpenCreateModal"] == true;
 }
 
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h4 mb-0">Book Management</h1>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createBookModal">
+            Nuevo
+        </button>
+    </div>
 
-<h1>
-    Book Management
-</h1>
+    @if (TempData["ok"] is string ok)
+    {
+        <div class="alert alert-success">@ok</div>
+    }
+    @if (TempData["err"] is string err)
+    {
+        <div class="alert alert-danger">@err</div>
+    }
+
+    <!-- Aquí podrías listar libros existentes, si quieres, en otra tabla -->
+    <!-- Modal Crear Libro -->
+    <div class="modal fade" id="createBookModal" tabindex="-1" aria-labelledby="createBookLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form asp-controller="Books" asp-action="Create" method="post" novalidate>
+                    @Html.AntiForgeryToken()
+
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="createBookLabel">Nuevo libro</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="Title" class="form-label"></label>
+                            <input asp-for="Title" class="form-control" placeholder="Título del libro" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Author" class="form-label"></label>
+                            <input asp-for="Author" class="form-control" placeholder="Autor" />
+                            <span asp-validation-for="Author" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Genre" class="form-label"></label>
+                            <input asp-for="Genre" class="form-control" placeholder="Género" />
+                            <span asp-validation-for="Genre" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-1">
+                            <label asp-for="AvailableCopies" class="form-label"></label>
+                            <input asp-for="AvailableCopies" class="form-control" type="number" min="0" step="1" placeholder="0" />
+                            <span asp-validation-for="AvailableCopies" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    @if (openCreate)
+    {
+        <script>
+            // Si hubo errores de validación, reabrimos el modal al recargar
+            document.addEventListener('DOMContentLoaded', function () {
+              var modal = new bootstrap.Modal(document.getElementById('createBookModal'));
+              modal.show();
+            });
+        </script>
+    }
+}

@@ -1,9 +1,161 @@
-﻿@{
+﻿@using Morning.Value.Web.Site.Common
+@using Morning.Value.Web.Site.Common.Models
+@using Morning.Value.Web.Site.Loans.Enums
+@using Morning.Value.Web.Site.Loans.Models
+@model PagedResult<LoanHistoryItem>
+
+@{
     ViewData["Title"] = "Book History";
     Layout = "_Layout";
+    string q = Model.Query ?? "";
+    string status = Model.StatusFilter?.ToLower() ?? "all";
+    string QueryStringFor(int page) =>
+        $"?q={Uri.EscapeDataString(q)}&status={status}&page={page}&pageSize={Model.PageSize}";
+
+    int from = (Model.TotalCount == 0) ? 0 : ((Model.PageIndex - 1) * Model.PageSize) + 1;
+    int to = Math.Min(Model.PageIndex * Model.PageSize, Model.TotalCount);
 }
 
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-xl-10">
+            <div class="card shadow-lg border-0 rounded-3">
+                <div class="card-header bg-white border-0 py-3">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                        <h1 class="h4 mb-0">Book History</h1>
+                        <span class="text-muted small">
+                            Mostrando <strong>@from–@to</strong> de <strong>@Model.TotalCount</strong> registros
+                        </span>
+                    </div>
+                </div>
 
-<h1>
-    Book History
-</h1>
+                <div class="card-body">
+                    @if (TempData["ok"] is string ok)
+                    {
+                        <div class="alert alert-success mb-3">@ok</div>
+                    }
+                    @if (TempData["err"] is string err)
+                    {
+                        <div class="alert alert-danger mb-3">@err</div>
+                    }
+
+                    <form method="get" class="row g-3 align-items-end mb-2">
+                        <div class="col-sm-7 col-md-6">
+                            <label for="q" class="form-label">Buscar (título, autor, género)</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zm-5.242 1.106a5 5 0 1 1 0-10.001 5 5 0 0 1 0 10.001z" />
+                                    </svg>
+                                </span>
+                                <input id="q" name="q" class="form-control" value="@q" placeholder="Escribe para buscar..." />
+                            </div>
+                        </div>
+
+                        <div class="col-sm-5 col-md-3">
+                            <label for="status" class="form-label">Estado</label>
+                            <select id="status" name="status" class="form-select">
+                                <option value="all" @(status == "all" ? "selected" : null)>Todos</option>
+                                <option value="borrowed" @(status == "borrowed" ? "selected" : null)>Prestado</option>
+                                <option value="returned" @(status == "returned" ? "selected" : null)>Devuelto</option>
+                            </select>
+                        </div>
+
+                        <div class="col-sm-12 col-md-3 d-grid">
+                            <button class="btn btn-primary" type="submit">Filtrar</button>
+                        </div>
+                    </form>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Título</th>
+                                    <th>Autor</th>
+                                    <th>Género</th>
+                                    <th>Fecha préstamo</th>
+                                    <th>Fecha devolución</th>
+                                    <th>Estado</th>
+                                    <th class="text-end">Acciones</th> <!-- NUEVO -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.Items.Count == 0)
+                                {
+                                    <tr><td colspan="7" class="text-center text-muted py-4">Sin resultados</td></tr>
+                                }
+                                else
+                                {
+                                    foreach (var x in Model.Items)
+                                    {
+                                        <tr>
+                                            <td>@x.BookTitle</td>
+                                            <td>@x.Author</td>
+                                            <td>@x.Genre</td>
+                                            <td>@x.LoanDate.ToString("yyyy-MM-dd")</td>
+                                            <td>@(x.ReturnDate?.ToString("yyyy-MM-dd") ?? "-")</td>
+                                            <td>
+                                                @if (x.Status == LoanStatus.Borrowed)
+                                                {
+                                                    <span class="badge bg-warning text-dark">Prestado</span>
+                                                }
+                                                else
+                                                {
+
+                                                    <span class="badge bg-success">Devuelto</span>
+                                                }
+                                            </td>
+                                            <td class="text-end">
+                                                @if (x.Status == LoanStatus.Borrowed)
+                                                {
+                                                    <form action="/loans/return" method="post"
+                                                          class="d-inline"
+                                                          onsubmit="return confirm('¿Confirmas la devolución?');">
+                                                        @Html.AntiForgeryToken()
+                                                        <input type="hidden" name="loanId" value="@x.LoanId" />
+                                                        <input type="hidden" name="returnUrl" value="@($"{Context.Request.Path}{Context.Request.QueryString}")" />
+                                                        <button type="submit" class="btn btn-sm btn-outline-success">
+                                                            Devolver
+                                                        </button>
+                                                    </form>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">—</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                @if (Model.TotalPages > 1)
+                {
+                    <div class="card-footer bg-white border-0">
+                        <nav aria-label="Paginación">
+                            <ul class="pagination mb-0">
+                                <li class="page-item @(Model.PageIndex == 1 ? "disabled" : "")">
+                                    <a class="page-link" href="@QueryStringFor(Model.PageIndex - 1)">Anterior</a>
+                                </li>
+
+                                @for (int i = 1; i <= Model.TotalPages; i++)
+                                {
+                                    <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                                        <a class="page-link" href="@QueryStringFor(i)">@i</a>
+                                    </li>
+                                }
+
+                                <li class="page-item @(Model.PageIndex == Model.TotalPages ? "disabled" : "")">
+                                    <a class="page-link" href="@QueryStringFor(Model.PageIndex + 1)">Siguiente</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

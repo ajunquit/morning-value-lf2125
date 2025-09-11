@@ -1,6 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Morning.Value.Web.Site.Controllers;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Morning.Value.Web.Site.Books.Models;
+using Morning.Value.Web.Site.Common.Models;
+using Morning.Value.Web.Site.Home.Controllers;
+using Morning.Value.Web.Site.Loans;
+using Morning.Value.Web.Site.Loans.Enums;
+using Morning.Value.Web.Site.Loans.Models;
+using System.Security.Claims;
+using static Morning.Value.Web.Site.Books.BookRepository;
 
 namespace Morning.Value.Web.Site.Books.Controllers
 {
@@ -8,90 +16,77 @@ namespace Morning.Value.Web.Site.Books.Controllers
     public class BooksController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly ILoanRepository _loans;
+        private readonly IBookRepository _books;
 
-        public BooksController(ILogger<HomeController> logger)
+        public BooksController(ILogger<HomeController> logger,
+            ILoanRepository loans,
+            IBookRepository books)
         {
             _logger = logger;
+            _loans = loans;
+            _books = books;
         }
         // GET: BookController
         [Authorize(Roles = "Admin")]
         public IActionResult Management()
         {
-            return View("~/Books/Views/Management.cshtml");
+            return View("~/Books/Views/Management.cshtml", new BookCreateViewModel());
         }
+
         [Authorize(Roles = "Reader")]
-        public IActionResult History()
+        public async Task<IActionResult> History(string? q, string status = "all", int page = 1, int pageSize = 10)
         {
-            return View("~/Books/Views/History.cshtml");
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)
+                  ?? User.FindFirstValue(ClaimTypes.Email)
+                  ?? User.Identity?.Name
+                  ?? throw new InvalidOperationException("UserId no disponible");
+
+            LoanStatus? st = status?.ToLower() switch
+            {
+                "borrowed" => LoanStatus.Borrowed,
+                "returned" => LoanStatus.Returned,
+                _ => (LoanStatus?)null
+            };
+
+            var result = await _loans.GetHistoryByUserAsync(userId, q, st, page, pageSize);
+
+            // Mantener filtros en la vista
+            result = new PagedResult<LoanHistoryItem>
+            {
+                Items = result.Items,
+                PageIndex = result.PageIndex,
+                PageSize = result.PageSize,
+                TotalCount = result.TotalCount,
+                Query = q,
+                StatusFilter = status
+            };
+
+            return View("~/Books/Views/History.cshtml", result);
         }
 
-        // GET: BookController/Details/5
-        public IActionResult Details(int id)
-        {
-            return View();
-        }
-
-        // GET: BookController/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: BookController/Create
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(IFormCollection collection)
+        public async Task<IActionResult> Create(BookCreateViewModel model)
         {
-            try
+            if (!ModelState.IsValid)
             {
-                return RedirectToAction(nameof(Index));
+                ViewData["OpenCreateModal"] = true; // reabrir modal con errores
+                return View("~/Books/Views/Management.cshtml", model);
             }
-            catch
-            {
-                return View();
-            }
-        }
 
-        // GET: BookController/Edit/5
-        public IActionResult Edit(int id)
-        {
-            return View();
-        }
+            // TODO: persistir con tu servicio/repositorio
+            await _books.CreateAsync(
+                title: model.Title,
+                author: model.Author,
+                genre: model.Genre,
+                availableCopies: model.AvailableCopies
+            );
 
-        // POST: BookController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: BookController/Delete/5
-        public IActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: BookController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            TempData["ok"] = "Libro creado correctamente.";
+            return RedirectToAction(nameof(Management));
         }
     }
 }
