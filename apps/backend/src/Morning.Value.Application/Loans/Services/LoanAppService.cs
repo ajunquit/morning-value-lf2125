@@ -16,9 +16,6 @@ namespace Morning.Value.Application.Loans.Services
             _uow = uow;
         }
 
-        /// <summary>
-        /// Crea un préstamo si hay disponibilidad. Evita duplicados activos del mismo libro para el mismo usuario.
-        /// </summary>
         public async Task<BorrowResponse> BorrowAsync(Guid userId, Guid bookId, CancellationToken ct = default)
         {
             // 1) Cargar libro
@@ -83,17 +80,13 @@ namespace Morning.Value.Application.Loans.Services
             };
         }
 
-        /// <summary>
-        /// Marca devolución y devuelve una copia al inventario.
-        /// </summary>
         public async Task<bool> ReturnAsync(Guid loanId, CancellationToken ct = default)
         {
             // 1) Cargar préstamo
             var loan = await _uow.LoanRepository.GetAsync(loanId);
-            if (loan is null) return false;                // o lanzar excepción si prefieres
+            if (loan is null) return false;
 
-            if (loan.ReturnDateUtc is not null) return false; // ya devuelto
-
+            if (loan.ReturnDateUtc is not null) return false; 
             // 2) Cargar libro
             var book = await _uow.BookRepository.GetAsync(loan.BookId);
             if (book is null) throw new DomainException("Libro del préstamo no encontrado.");
