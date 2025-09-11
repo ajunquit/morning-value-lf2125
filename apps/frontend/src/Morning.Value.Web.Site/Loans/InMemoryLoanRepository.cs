@@ -1,4 +1,4 @@
-﻿using Morning.Value.Web.Site.Common.Models;
+﻿using Morning.Value.Application.Common.Dtos;
 using Morning.Value.Web.Site.Loans.Enums;
 using Morning.Value.Web.Site.Loans.Models;
 

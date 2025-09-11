@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Morning.Value.Application.Books.Services;
 using Morning.Value.Web.Site.Books;
 using Morning.Value.Web.Site.Home.Models;
 using Morning.Value.Web.Site.Loans;
@@ -13,16 +14,19 @@ namespace Morning.Value.Web.Site.Home.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IBookAppService _bookAppService;
         private readonly IBookRepository _books;
         private readonly LibraryService _svc;
 
         public HomeController(ILogger<HomeController> logger,
+            IBookAppService bookAppService,
             IBookRepository books,
             LibraryService svc)
         {
             _logger = logger;
-            this._books = books;
-            this._svc = svc;
+            _bookAppService = bookAppService;
+            _books = books;
+            _svc = svc;
         }
 
         [HttpGet]
@@ -32,7 +36,7 @@ namespace Morning.Value.Web.Site.Home.Controllers
                 return View("~/Home/Views/Index.Admin.cshtml");   // Views/Home/Index.Admin.cshtml
 
             if (User.IsInRole("Reader")) {
-                var data = await _books.GetAllAsync(); // trae todos los libros
+                var data = await _bookAppService.GetAllAsync(); // trae todos los libros
                 var vm = new ReaderHomeViewModel
                 {
                     Books = data.Select(b => new BookCardViewModel

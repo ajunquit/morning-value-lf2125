@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Morning.Value.Application.Books.Services;
+using Morning.Value.Application.Common.Dtos;
 using Morning.Value.Web.Site.Books.Models;
-using Morning.Value.Web.Site.Common.Models;
 using Morning.Value.Web.Site.Home.Controllers;
 using Morning.Value.Web.Site.Loans;
 using Morning.Value.Web.Site.Loans.Enums;
@@ -33,7 +33,7 @@ namespace Morning.Value.Web.Site.Books.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Management(string? q, int page = 1, int pageSize = 10)
         {
-            var grid = await _books.SearchAsync(q, page, pageSize);
+            var grid = await _bookAppService.SearchAsync(q, page, pageSize);
 
             var vm = new BookManagementViewModel
             {
@@ -91,7 +91,7 @@ namespace Morning.Value.Web.Site.Books.Controllers
                 var page = int.TryParse(Request.Query["page"], out var p) ? p : 1;
                 var pageSize = int.TryParse(Request.Query["pageSize"], out var ps) ? ps : 10;
 
-                var grid = await _books.SearchAsync(q, page, pageSize);
+                var grid = await _bookAppService.SearchAsync(q, page, pageSize);
 
                 var vm = new BookManagementViewModel
                 {

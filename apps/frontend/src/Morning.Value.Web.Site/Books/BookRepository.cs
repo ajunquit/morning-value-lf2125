@@ -1,4 +1,5 @@
-﻿using Morning.Value.Web.Site.Books.Models;
+﻿using Morning.Value.Application.Common.Dtos;
+using Morning.Value.Web.Site.Books.Models;
 using Morning.Value.Web.Site.Common.Models;
 
 namespace Morning.Value.Web.Site.Books

@@ -1,4 +1,5 @@
-﻿using Morning.Value.Web.Site.Common.Models;
+﻿using Morning.Value.Application.Books.Dtos;
+using Morning.Value.Application.Common.Dtos;
 
 namespace Morning.Value.Web.Site.Books.Models
 {
@@ -8,7 +9,7 @@ namespace Morning.Value.Web.Site.Books.Models
         public BookCreateViewModel Create { get; set; } = new();
 
         // Grilla de consulta
-        public PagedResult<BookListItem> Grid { get; set; } = new();
+        public PagedResult<BookResponse> Grid { get; set; } = new();
 
         // Filtro actual (texto libre)
         public string? Query { get; set; }
