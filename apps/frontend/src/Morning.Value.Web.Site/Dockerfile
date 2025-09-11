@@ -1,30 +1,31 @@
-# See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
-
-# This stage is used when running from VS in fast mode (Default for Debug configuration)
+# Etapa base (runtime)
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
 
-# This stage is used to build the service project
+# Etapa build
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["apps/frontend/src/Morning.Value.Web.Site/Morning.Value.Web.Site.csproj", "apps/frontend/src/Morning.Value.Web.Site/"]
-RUN dotnet restore "./apps/frontend/src/Morning.Value.Web.Site/Morning.Value.Web.Site.csproj"
+
+# TIP: si tienes ProjectReference a Application/Domain/etc, o copias el .sln y todo,
+# o copias los .csproj referenciados. Lo más simple: copia todo y restaura.
 COPY . .
 WORKDIR "/src/apps/frontend/src/Morning.Value.Web.Site"
-RUN dotnet build "./Morning.Value.Web.Site.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet restore "Morning.Value.Web.Site.csproj"
+RUN dotnet build "Morning.Value.Web.Site.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
-# This stage is used to publish the service project to be copied to the final stage
+# Etapa publish
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Morning.Value.Web.Site.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+WORKDIR "/src/apps/frontend/src/Morning.Value.Web.Site"
+RUN dotnet publish "Morning.Value.Web.Site.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
-# This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
+# Final
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+# Para evitar líos con HTTPS en contenedor, sirve HTTP en 8080.
+ENV ASPNETCORE_URLS=http://+:8080
 ENTRYPOINT ["dotnet", "Morning.Value.Web.Site.dll"]
-
