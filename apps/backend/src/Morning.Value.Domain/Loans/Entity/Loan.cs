@@ -14,7 +14,7 @@ namespace Morning.Value.Domain.Loans.Entity
 
         public LoanStatus Status => ReturnDateUtc.HasValue ? LoanStatus.Returned : LoanStatus.Borrowed;
 
-        private Loan() { } // EF
+        private Loan() { } 
 
         public static Loan Create(Guid userId, Guid bookId, DateTime? whenUtc = null)
         {

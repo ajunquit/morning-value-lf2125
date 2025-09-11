@@ -8,11 +8,9 @@ namespace Morning.Value.Domain.Books.Entity
         public string Title { get; private set; } = string.Empty;
         public string Author { get; private set; } = string.Empty;
         public string Genre { get; private set; } = string.Empty;
-
-        /// <summary>Copias disponibles para préstamo (>= 0).</summary>
         public int AvailableCopies { get; private set; }
 
-        private Book() { } // EF
+        private Book() { } 
 
         public Book(string title, string author, string genre, int availableCopies)
         {
@@ -48,17 +46,14 @@ namespace Morning.Value.Domain.Books.Entity
 
         public bool HasAvailability(int quantity = 1) => AvailableCopies >= quantity;
 
-        /// <summary>Reserva una copia (decrementa disponibilidad).</summary>
         public void ReserveOne()
         {
             if (!HasAvailability()) throw new DomainException("No hay copias disponibles para préstamo.");
             AvailableCopies -= 1;
         }
 
-        /// <summary>Devuelve una copia (incrementa disponibilidad).</summary>
         public void ReturnOne()
         {
-            // Si quieres techo con TotalCopies en el futuro, valida aquí.
             AvailableCopies += 1;
         }
     }

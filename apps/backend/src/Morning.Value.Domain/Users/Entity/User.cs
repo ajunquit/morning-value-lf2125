@@ -6,16 +6,13 @@ namespace Morning.Value.Domain.Users.Entity
 {
     public class User: AuditableEntity
     {
-        // Requeridos para autenticación y reglas de negocio
         public string Name { get; private set; } = string.Empty;
         public string Email { get; private set; } = string.Empty;
-
-        // El hash pertenece a Infra (creación), pero el valor se conserva en Dominio.
         public string PasswordHash { get; private set; } = string.Empty;
 
         public RoleType Role { get; private set; } = RoleType.Reader;
 
-        private User() { } // Para EF
+        private User() { }
 
         public User(string name, string email, string passwordHash, RoleType role = RoleType.Reader)
         {
