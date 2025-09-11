@@ -52,7 +52,7 @@ namespace Morning.Value.Web.Site.Auth.Controllers
                 new Claim(ClaimTypes.Role, (result.Role ?? RoleType.Reader).ToString())
             };
 
-            // 2) Construir principal + propiedades (persistente si RememberMe)
+            // 2) Construir principal + propiedades
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             var principal = new ClaimsPrincipal(identity);
             var props = new AuthenticationProperties
@@ -69,7 +69,7 @@ namespace Morning.Value.Web.Site.Auth.Controllers
 
             return (result.Role == RoleType.Admin)
                  ? RedirectToAction("Management", "Books")
-                 : RedirectToAction("History", "Books");
+                 : RedirectToAction("Index", "Home");
         }
 
         [HttpGet, AllowAnonymous]

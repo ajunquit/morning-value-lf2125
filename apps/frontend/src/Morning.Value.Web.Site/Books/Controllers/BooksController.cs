@@ -2,12 +2,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Morning.Value.Application.Books.Services;
 using Morning.Value.Application.Common.Dtos;
+using Morning.Value.Application.Common.Services;
 using Morning.Value.Application.Loans.Dtos;
 using Morning.Value.Application.Loans.Services;
 using Morning.Value.Domain.Loans.Enums;
 using Morning.Value.Web.Site.Books.Models;
 using Morning.Value.Web.Site.Home.Controllers;
-using System.Security.Claims;
 
 namespace Morning.Value.Web.Site.Books.Controllers
 {
@@ -15,14 +15,17 @@ namespace Morning.Value.Web.Site.Books.Controllers
     public class BooksController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly ICurrentUserService _currentUserService;
         private readonly ILoanAppService _loanAppService;
         private readonly IBookAppService _bookAppService;
 
         public BooksController(ILogger<HomeController> logger,
+            ICurrentUserService currentUserService,
             ILoanAppService loanAppService,
             IBookAppService bookAppService)
         {
             _logger = logger;
+            _currentUserService = currentUserService;
             _loanAppService = loanAppService;
             _bookAppService = bookAppService;
         }
@@ -45,11 +48,7 @@ namespace Morning.Value.Web.Site.Books.Controllers
         [Authorize(Roles = "Reader")]
         public async Task<IActionResult> History(string? q, string status = "all", int page = 1, int pageSize = 10)
         {
-
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)
-                  ?? User.FindFirstValue(ClaimTypes.Email)
-                  ?? User.Identity?.Name
-                  ?? throw new InvalidOperationException("UserId no disponible");
+            var userId = _currentUserService.UserId ?? throw new InvalidOperationException("UserId no disponible");
 
             LoanStatus? st = status?.ToLower() switch
             {
