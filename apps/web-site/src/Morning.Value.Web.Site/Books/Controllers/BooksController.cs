@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Morning.Value.Web.Site.Books.Models;
 using Morning.Value.Web.Site.Common.Models;
 using Morning.Value.Web.Site.Home.Controllers;
@@ -8,7 +7,6 @@ using Morning.Value.Web.Site.Loans;
 using Morning.Value.Web.Site.Loans.Enums;
 using Morning.Value.Web.Site.Loans.Models;
 using System.Security.Claims;
-using static Morning.Value.Web.Site.Books.BookRepository;
 
 namespace Morning.Value.Web.Site.Books.Controllers
 {
@@ -27,11 +25,20 @@ namespace Morning.Value.Web.Site.Books.Controllers
             _loans = loans;
             _books = books;
         }
-        // GET: BookController
+
         [Authorize(Roles = "Admin")]
-        public IActionResult Management()
+        public async Task<IActionResult> Management(string? q, int page = 1, int pageSize = 10)
         {
-            return View("~/Books/Views/Management.cshtml", new BookCreateViewModel());
+            var grid = await _books.SearchAsync(q, page, pageSize);
+
+            var vm = new BookManagementViewModel
+            {
+                Create = new BookCreateViewModel(),
+                Grid = grid,
+                Query = q
+            };
+
+            return View("~/Books/Views/Management.cshtml", vm);
         }
 
         [Authorize(Roles = "Reader")]
@@ -73,11 +80,25 @@ namespace Morning.Value.Web.Site.Books.Controllers
         {
             if (!ModelState.IsValid)
             {
-                ViewData["OpenCreateModal"] = true; // reabrir modal con errores
-                return View("~/Books/Views/Management.cshtml", model);
+                ViewData["OpenCreateModal"] = true;
+
+                // Volver a armar la grilla con los filtros actuales de la URL
+                var q = Request.Query["q"].ToString();
+                var page = int.TryParse(Request.Query["page"], out var p) ? p : 1;
+                var pageSize = int.TryParse(Request.Query["pageSize"], out var ps) ? ps : 10;
+
+                var grid = await _books.SearchAsync(q, page, pageSize);
+
+                var vm = new BookManagementViewModel
+                {
+                    Create = model,
+                    Grid = grid,
+                    Query = q
+                };
+
+                return View("~/Books/Views/Management.cshtml", vm);
             }
 
-            // TODO: persistir con tu servicio/repositorio
             await _books.CreateAsync(
                 title: model.Title,
                 author: model.Author,
@@ -86,7 +107,8 @@ namespace Morning.Value.Web.Site.Books.Controllers
             );
 
             TempData["ok"] = "Libro creado correctamente.";
-            return RedirectToAction(nameof(Management));
+            // Preservar filtros actuales
+            return RedirectToAction(nameof(Management), new { q = Request.Query["q"], page = Request.Query["page"], pageSize = Request.Query["pageSize"] });
         }
     }
 }

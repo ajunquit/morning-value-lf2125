@@ -1,4 +1,5 @@
-﻿using Morning.Value.Web.Site.Home.Models;
+﻿using Morning.Value.Web.Site.Books.Models;
+using Morning.Value.Web.Site.Common.Models;
 
 namespace Morning.Value.Web.Site.Books
 {
@@ -43,6 +44,53 @@ namespace Morning.Value.Web.Site.Books
                 .AsEnumerable();
 
             return Task.FromResult(items);
+        }
+
+        public Task<PagedResult<BookListItem>> SearchAsync(string? q, int page, int pageSize)
+        {
+            IEnumerable<Book> query = _books;
+
+            if (!string.IsNullOrWhiteSpace(q))
+            {
+                var s = q.Trim().ToLowerInvariant();
+                query = query.Where(b =>
+                    b.Title.ToLower().Contains(s) ||
+                    b.Author.ToLower().Contains(s) ||
+                    b.Genre.ToLower().Contains(s));
+            }
+
+            var total = query.Count();
+            var items = query
+                .OrderBy(b => b.Title)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(b => new BookListItem
+                {
+                    Id = b.Id,
+                    Title = b.Title,
+                    Author = b.Author,
+                    Genre = b.Genre,
+                    AvailableCopies = b.AvailableCopies
+                })
+                .ToList();
+
+            return Task.FromResult(new PagedResult<BookListItem>
+            {
+                Items = items,
+                PageIndex = page,
+                PageSize = pageSize,
+                TotalCount = total,
+                Query = q
+            });
+        }
+
+        public Task<Book?> GetByIdAsync(int id) => Task.FromResult(_books.FirstOrDefault(b => b.Id == id));
+
+        public Task UpdateAsync(Book book)
+        {
+            var i = _books.FindIndex(b => b.Id == book.Id);
+            if (i >= 0) _books[i] = book;
+            return Task.CompletedTask;
         }
 
         public class Book

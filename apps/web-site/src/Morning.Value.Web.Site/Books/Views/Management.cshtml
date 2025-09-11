@@ -1,11 +1,20 @@
 ﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @using Morning.Value.Web.Site.Books.Models
-@model BookCreateViewModel
+@using Morning.Value.Web.Site.Common.Models
+@model BookManagementViewModel
 
 @{
     ViewData["Title"] = "Book Management";
     Layout = "_Layout";
     bool openCreate = (bool?)ViewData["OpenCreateModal"] == true;
+
+    var grid = Model.Grid;
+    string q = Model.Query ?? "";
+    string QueryStringFor(int page) =>
+        $"?q={Uri.EscapeDataString(q)}&page={page}&pageSize={grid.PageSize}";
+
+    int from = (grid.TotalCount == 0) ? 0 : ((grid.PageIndex - 1) * grid.PageSize) + 1;
+    int to = Math.Min(grid.PageIndex * grid.PageSize, grid.TotalCount);
 }
 
 <div class="container py-4">
@@ -25,7 +34,92 @@
         <div class="alert alert-danger">@err</div>
     }
 
-    <!-- Aquí podrías listar libros existentes, si quieres, en otra tabla -->
+    <!-- Filtros de consulta -->
+    <div class="card shadow-lg border-0 rounded-3 mb-4">
+        <div class="card-header bg-white border-0 py-3">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                <h2 class="h5 mb-0">Consulta de libros</h2>
+                <span class="text-muted small">Mostrando <strong>@from–@to</strong> de <strong>@grid.TotalCount</strong> registros</span>
+            </div>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-end mb-2">
+                <div class="col-sm-8 col-md-6">
+                    <label for="q" class="form-label">Buscar (título, autor, género)</label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zm-5.242 1.106a5 5 0 1 1 0-10.001 5 5 0 0 1 0 10.001z" />
+                            </svg>
+                        </span>
+                        <input id="q" name="q" class="form-control" value="@q" placeholder="Escribe para buscar..." />
+                    </div>
+                </div>
+                <div class="col-sm-4 col-md-3 d-grid">
+                    <label class="form-label d-none d-md-block">&nbsp;</label>
+                    <button class="btn btn-primary" type="submit">Filtrar</button>
+                </div>
+            </form>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Título</th>
+                            <th>Autor</th>
+                            <th>Género</th>
+                            <th class="text-end">Disponibles</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (grid.Items.Count == 0)
+                        {
+                            <tr><td colspan="4" class="text-center text-muted py-4">Sin resultados</td></tr>
+                        }
+                        else
+                        {
+                            foreach (var b in grid.Items)
+                            {
+                                <tr>
+                                    <td>@b.Title</td>
+                                    <td>@b.Author</td>
+                                    <td>@b.Genre</td>
+                                    <td class="text-end">
+                                        <span class="badge @(b.AvailableCopies > 0 ? "bg-success" : "bg-secondary")">
+                                            @b.AvailableCopies
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        @if (grid.TotalPages > 1)
+        {
+            <div class="card-footer bg-white border-0">
+                <nav aria-label="Paginación">
+                    <ul class="pagination mb-0">
+                        <li class="page-item @(grid.PageIndex == 1 ? "disabled" : "")">
+                            <a class="page-link" href="@QueryStringFor(grid.PageIndex - 1)">Anterior</a>
+                        </li>
+                        @for (int i = 1; i <= grid.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == grid.PageIndex ? "active" : "")">
+                                <a class="page-link" href="@QueryStringFor(i)">@i</a>
+                            </li>
+                        }
+                        <li class="page-item @(grid.PageIndex == grid.TotalPages ? "disabled" : "")">
+                            <a class="page-link" href="@QueryStringFor(grid.PageIndex + 1)">Siguiente</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        }
+    </div>
+
     <!-- Modal Crear Libro -->
     <div class="modal fade" id="createBookModal" tabindex="-1" aria-labelledby="createBookLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -42,27 +136,27 @@
                         <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
 
                         <div class="mb-3">
-                            <label asp-for="Title" class="form-label"></label>
-                            <input asp-for="Title" class="form-control" placeholder="Título del libro" />
-                            <span asp-validation-for="Title" class="text-danger"></span>
+                            <label asp-for="Create.Title" class="form-label"></label>
+                            <input asp-for="Create.Title" class="form-control" placeholder="Título del libro" />
+                            <span asp-validation-for="Create.Title" class="text-danger"></span>
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="Author" class="form-label"></label>
-                            <input asp-for="Author" class="form-control" placeholder="Autor" />
-                            <span asp-validation-for="Author" class="text-danger"></span>
+                            <label asp-for="Create.Author" class="form-label"></label>
+                            <input asp-for="Create.Author" class="form-control" placeholder="Autor" />
+                            <span asp-validation-for="Create.Author" class="text-danger"></span>
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="Genre" class="form-label"></label>
-                            <input asp-for="Genre" class="form-control" placeholder="Género" />
-                            <span asp-validation-for="Genre" class="text-danger"></span>
+                            <label asp-for="Create.Genre" class="form-label"></label>
+                            <input asp-for="Create.Genre" class="form-control" placeholder="Género" />
+                            <span asp-validation-for="Create.Genre" class="text-danger"></span>
                         </div>
 
                         <div class="mb-1">
-                            <label asp-for="AvailableCopies" class="form-label"></label>
-                            <input asp-for="AvailableCopies" class="form-control" type="number" min="0" step="1" placeholder="0" />
-                            <span asp-validation-for="AvailableCopies" class="text-danger"></span>
+                            <label asp-for="Create.AvailableCopies" class="form-label"></label>
+                            <input asp-for="Create.AvailableCopies" class="form-control" type="number" min="0" step="1" placeholder="0" />
+                            <span asp-validation-for="Create.AvailableCopies" class="text-danger"></span>
                         </div>
                     </div>
 
@@ -81,7 +175,6 @@
     @if (openCreate)
     {
         <script>
-            // Si hubo errores de validación, reabrimos el modal al recargar
             document.addEventListener('DOMContentLoaded', function () {
               var modal = new bootstrap.Modal(document.getElementById('createBookModal'));
               modal.show();
