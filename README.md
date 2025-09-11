@@ -27,7 +27,7 @@ apps/
       Morning.Value.Infrastructure.Tests/
   frontend/
     src/
-      Morning.Value.Web.Site/        <-- UI MVC (.NET 8) + Dockerfile
+      Morning.Value.Web.Site/        <-- UI MVC (.NET 8)
 ```
 
 ---
