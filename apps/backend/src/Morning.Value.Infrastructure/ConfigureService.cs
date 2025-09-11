@@ -1,12 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Morning.Value.Application.Common.Services;
 using Morning.Value.Domain.Book.Interfaces;
 using Morning.Value.Domain.Common.Interfaces;
 using Morning.Value.Domain.Loans.Interfaces;
+using Morning.Value.Domain.Users.Interfaces;
 using Morning.Value.Infrastructure.Persistences.Contexts;
 using Morning.Value.Infrastructure.Persistences.Interceptors;
 using Morning.Value.Infrastructure.Repositories;
+using Morning.Value.Infrastructure.Security;
 
 namespace Morning.Value.Infrastructure
 {
@@ -18,7 +22,13 @@ namespace Morning.Value.Infrastructure
         {
             RegisterDbContexts(services, configuration);
             RegisterRepositories(services);
+            RegisterSecurities(services);
             return services;
+        }
+
+        private static void RegisterSecurities(IServiceCollection services)
+        {
+            services.AddScoped<IPasswordHasher, IdentityPasswordHasher>();
         }
 
         private static void RegisterDbContexts(IServiceCollection services, IConfiguration configuration)
@@ -48,6 +58,7 @@ namespace Morning.Value.Infrastructure
             services.AddScoped<IUnitOfWorkAsync, UnitOfWorkAsync>();
             services.AddScoped<IBookRepositoryAsync, BookRepositoryAsync>();
             services.AddScoped<ILoanRepositoryAsync, LoanRepositoryAsync>();
+            services.AddScoped<IUserRepositoryAsync, UserRepositoryAsync>();
         }
     }
 }

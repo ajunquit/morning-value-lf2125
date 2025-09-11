@@ -2,14 +2,19 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Morning.Value.Application.Users.Services;
+using Morning.Value.Domain.Users.Enums;
 using Morning.Value.Web.Site.Auth.Models;
-using System.Data;
 using System.Security.Claims;
 
 namespace Morning.Value.Web.Site.Auth.Controllers
 {
     public class AuthController : Controller
     {
+        private readonly IAuthAppService _authAppService;
+
+        public AuthController(IAuthAppService authAppService) => _authAppService = authAppService;
+
         [HttpGet, AllowAnonymous]
         public IActionResult SignIn(string? returnUrl = null)
         {
@@ -32,22 +37,19 @@ namespace Morning.Value.Web.Site.Auth.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            // TODO Parte 2: validar credenciales con tu servicio (simulado OK aquí)
-            var isValid = true; // <- reemplazar
-            if (!isValid)
+            var result = await _authAppService.SignInAsync(model.Email!, model.Password!);
+            if (!result.Success)
             {
-                ModelState.AddModelError(string.Empty, "Credenciales inválidas");
-                return View(model);
+                ModelState.AddModelError(string.Empty, result.Error ?? "No se pudo iniciar sesión.");
+                return View("~/Auth/Views/SignIn.cshtml", model);
             }
 
-            bool isAdminFake = model.Email.Contains("admin");
-            // 1) Claims del usuario
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier,Guid.NewGuid().ToString()),        // id de tu usuario
-                new Claim(ClaimTypes.Name, isAdminFake ? "Admin":"Reader"),                // nombre
-                new Claim(ClaimTypes.Email, model.Email),           // email
-                new Claim(ClaimTypes.Role, isAdminFake ? "Admin":"Reader")                // rol
+                new Claim(ClaimTypes.NameIdentifier, result.UserId!.Value.ToString()),
+                new Claim(ClaimTypes.Name, result.Name ?? string.Empty),
+                new Claim(ClaimTypes.Email, result.Email ?? string.Empty),
+                new Claim(ClaimTypes.Role, (result.Role ?? RoleType.Reader).ToString())
             };
 
             // 2) Construir principal + propiedades (persistente si RememberMe)
@@ -64,7 +66,10 @@ namespace Morning.Value.Web.Site.Auth.Controllers
             // 4) Redirigir a returnUrl local o al Home (Books/Index si quieres)
             if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
                 return Redirect(returnUrl);
-            return RedirectToAction(isAdminFake ? "Management" : "History", "Books"); // o donde quieras entrar
+
+            return (result.Role == RoleType.Admin)
+                 ? RedirectToAction("Management", "Books")
+                 : RedirectToAction("History", "Books");
         }
 
         [HttpGet, AllowAnonymous]
@@ -72,14 +77,17 @@ namespace Morning.Value.Web.Site.Auth.Controllers
             => View("~/Auth/Views/SignUp.cshtml", new SignUpViewModel());
 
         [HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
-        public IActionResult SignUp(SignUpViewModel model)
+        public async Task<IActionResult> SignUp(SignUpViewModel model)
         {
             if (!ModelState.IsValid)
                 return View("~/Auth/Views/SignUp.cshtml", model);
 
-            // TODO: Registrar usuario (Parte 2). Por ahora, simular éxito:
-            // var ok = UserService.Create(model.Name, model.Email, model.Password);
-            // if(!ok) { ModelState.AddModelError("", "El correo ya está registrado."); return View(...); }
+            var r = await _authAppService.SignUpAsync(model.Name!, model.Email!, model.Password!, RoleType.Reader);
+            if (!r.Success)
+            {
+                ModelState.AddModelError(string.Empty, r.Error ?? "No se pudo registrar el usuario.");
+                return View("~/Auth/Views/SignUp.cshtml", model);
+            }
 
             TempData["ok"] = "Usuario registrado. Inicia sesión.";
             return RedirectToAction(nameof(SignIn));

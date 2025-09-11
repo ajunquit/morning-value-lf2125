@@ -1,11 +1,13 @@
 ﻿using Morning.Value.Domain.Book.Interfaces;
 using Morning.Value.Domain.Common.Interfaces;
 using Morning.Value.Domain.Loans.Interfaces;
+using Morning.Value.Domain.Users.Interfaces;
 using Morning.Value.Infrastructure.Persistences.Contexts;
 
 namespace Morning.Value.Infrastructure.Repositories
 {
     public class UnitOfWorkAsync(
+        IUserRepositoryAsync userRepository,
         ILoanRepositoryAsync loanRepository,
         IBookRepositoryAsync bookRepository,
         AppDbContext appDbContext) : IUnitOfWorkAsync, IDisposable
@@ -15,6 +17,8 @@ namespace Morning.Value.Infrastructure.Repositories
         public IBookRepositoryAsync BookRepository { get; } = bookRepository;
 
         public ILoanRepositoryAsync LoanRepository { get; } = loanRepository;
+
+        public IUserRepositoryAsync UserRepository { get; } = userRepository;
 
         public void Dispose()
         {
