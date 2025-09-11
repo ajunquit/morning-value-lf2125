@@ -1,6 +1,99 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
+    Layout = "_AuthLayout";
+    ViewData["Title"] = "Sign Up";
 }
-<h1>Sign Up</h1>
+
+<div class="container min-vh-100 d-flex align-items-center justify-content-center">
+    <div class="col-12 col-sm-10 col-md-7 col-lg-5">
+        <div class="card shadow-lg border-0 rounded-3">
+            <div class="card-body p-4 p-md-5">
+                <h1 class="h3 mb-1 text-center">Crear cuenta</h1>
+                <p class="text-secondary text-center mb-4">Registra tus datos para continuar</p>
+
+                <form asp-controller="Auth" asp-action="SignUp" method="post" novalidate>
+                    @Html.AntiForgeryToken()
+
+                    <div class="mb-3">
+                        <label for="Name" class="form-label">Nombre <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="Name" name="Name"
+                               placeholder="Tu nombre completo" required />
+                        <div class="invalid-feedback">El nombre es obligatorio.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="Email" class="form-label">Correo <span class="text-danger">*</span></label>
+                        <input type="email" class="form-control" id="Email" name="Email"
+                               placeholder="nombre@dominio.com" required />
+                        <div class="invalid-feedback">Ingresa un correo válido.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="Password" class="form-label">Contraseña <span class="text-danger">*</span></label>
+                        <input type="password" class="form-control" id="Password" name="Password"
+                               placeholder="••••••••" minlength="6" autocomplete="new-password" required />
+                        <div class="invalid-feedback">La contraseña debe tener al menos 6 caracteres.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="ConfirmPassword" class="form-label">Confirmar contraseña <span class="text-danger">*</span></label>
+                        <input type="password" class="form-control" id="ConfirmPassword" name="ConfirmPassword"
+                               placeholder="Repite la contraseña" minlength="6" autocomplete="new-password" required />
+                        <div class="invalid-feedback">Las contraseñas no coinciden.</div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-2">Crear cuenta</button>
+                </form>
+
+                <div class="text-center mt-4">
+                    <span class="text-secondary">¿Ya tienes cuenta?</span>
+                    <a href="@Url.Action("SignIn", "Auth")">Iniciar sesión</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Validación Bootstrap + reglas: email requerido, password >= 6, confirmación igual
+        (function () {
+          'use strict';
+          const form = document.querySelector('form');
+          const email = document.getElementById('Email');
+          const pwd = document.getElementById('Password');
+          const cpwd = document.getElementById('ConfirmPassword');
+          const MIN = 6;
+
+          function validateEmail() {
+            const ok = email.value.trim() !== '';
+            email.setCustomValidity(ok ? '' : 'El correo es obligatorio.');
+            return ok;
+          }
+
+          function validatePassword() {
+            const ok = (pwd.value.length >= MIN);
+            pwd.setCustomValidity(ok ? '' : `Mínimo ${MIN} caracteres.`);
+            return ok;
+          }
+
+          function validateConfirm() {
+            const ok = (cpwd.value.length >= MIN) && (cpwd.value === pwd.value);
+            cpwd.setCustomValidity(ok ? '' : 'Las contraseñas no coinciden.');
+            return ok;
+          }
+
+          email.addEventListener('input', validateEmail);
+          pwd.addEventListener('input', () => { validatePassword(); validateConfirm(); });
+          cpwd.addEventListener('input', validateConfirm);
+
+          form.addEventListener('submit', function (event) {
+            const ok = validateEmail() & validatePassword() & validateConfirm();
+            if (!form.checkValidity() || !ok) {
+              event.preventDefault();
+              event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+          }, false);
+        })();
+    </script>
+}
