@@ -89,7 +89,7 @@ namespace Morning.Value.Web.Site.Auth.Controllers
                 return View("~/Auth/Views/SignUp.cshtml", model);
             }
 
-            TempData["ok"] = "Usuario registrado. Inicia sesión.";
+            TempData["ok"] = "Usuario registrado. Inicia sesion.";
             return RedirectToAction(nameof(SignIn));
         }
 
