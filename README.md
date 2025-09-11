@@ -171,6 +171,32 @@ INSERT INTO [dbo].[Users]
 
 ---
 
+## Anexos
+
+### Pantallas Compartidas
+Sign In
+<img width="1416" height="801" alt="image" src="https://github.com/user-attachments/assets/9596c3c2-973c-400c-adee-474f1f9bf143" />
+
+Sign Up
+<img width="1418" height="798" alt="image" src="https://github.com/user-attachments/assets/1d09527b-6c00-4739-aa54-fbe6fbadfa5e" />
+
+
+### Pantallas de rol Reader
+Catalogo de Libros Registrados
+<img width="1428" height="798" alt="image" src="https://github.com/user-attachments/assets/367f5e12-9b3f-4feb-a78e-9bdd8761bea1" />
+
+Historico de Libros Prestados (El usuario en esta pantalla puede devolver los libros)
+<img width="1425" height="799" alt="image" src="https://github.com/user-attachments/assets/723973d9-eddc-478a-af43-724d1425ef6b" />
+
+### Pantallas de rol Admin
+Consulta de Libros por Titulo, Autor y Genero. Tambien puede visualizar su Stock
+<img width="1417" height="804" alt="image" src="https://github.com/user-attachments/assets/a43a45ae-113d-40bb-b079-81c2234b8732" />
+
+Registrar un nuevo libro
+<img width="548" height="562" alt="image" src="https://github.com/user-attachments/assets/65cfc1f0-247b-4aab-9b3f-027699ca40bd" />
+
+---
+
 ## Licencia
 
 Uso educativo / demo.
