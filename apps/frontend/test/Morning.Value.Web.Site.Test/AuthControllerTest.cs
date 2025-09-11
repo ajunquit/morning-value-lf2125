@@ -276,7 +276,7 @@ namespace Morning.Value.Web.Site.Test
             redir.Should().NotBeNull();
             redir!.ActionName.Should().Be(nameof(AuthController.SignIn));
 
-            controller.TempData["ok"].Should().Be("Usuario registrado. Inicia sesión.");
+            controller.TempData["ok"].Should().Be("Usuario registrado. Inicia sesion.");
         }
 
         // ---------------- POST /auth/signout ----------------
