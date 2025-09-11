@@ -17,7 +17,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{37655BD0-6
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "apps", "apps", "{B9178864-4CB1-4200-B416-6E076EFE1F88}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Morning.Value.Web.Site", "apps\frontend\src\Morning.Value.Web.Site\Morning.Value.Web.Site.csproj", "{F483C1F2-7F74-DE8C-0D21-DC28C2E562A9}"
+EndProject
 Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F483C1F2-7F74-DE8C-0D21-DC28C2E562A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F483C1F2-7F74-DE8C-0D21-DC28C2E562A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F483C1F2-7F74-DE8C-0D21-DC28C2E562A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F483C1F2-7F74-DE8C-0D21-DC28C2E562A9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
@@ -28,6 +40,7 @@ Global
 		{9B310376-18DD-4E8E-9C34-C475DBC576A5} = {B9178864-4CB1-4200-B416-6E076EFE1F88}
 		{3B97B646-AD45-46A4-B414-62DE0354394B} = {F17F7E94-CA92-4493-925B-5B88DBFD5B4E}
 		{37655BD0-6B2D-4DD9-A2B2-15D833D7A558} = {F17F7E94-CA92-4493-925B-5B88DBFD5B4E}
+		{F483C1F2-7F74-DE8C-0D21-DC28C2E562A9} = {3B97B646-AD45-46A4-B414-62DE0354394B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A09151B9-2D67-4CE3-B940-1666F8D5A1F9}
