@@ -11,6 +11,8 @@
 
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="8.6.0" />
+    <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="8.0.18" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.18" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageReference Include="Moq" Version="4.20.72" />
     <PackageReference Include="xunit" Version="2.9.3" />
@@ -25,6 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Morning.Value.Application\Morning.Value.Application.csproj" />
     <ProjectReference Include="..\..\src\Morning.Value.Infrastructure\Morning.Value.Infrastructure.csproj" />
   </ItemGroup>
 
