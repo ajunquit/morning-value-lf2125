@@ -50,4 +50,79 @@ jobs:
       - name: Cache status
         shell: bash
         run: |
-          echo "NuGet cache hit: ${{ steps.cache
+          echo "NuGet cache hit: ${{ steps.cache_nuget.outputs['cache-hit'] }}"
+
+      - name: Restore
+        shell: bash
+        run: |
+          sln=$(ls -1 **/*.sln 2>/dev/null | head -n 1 || true)
+          if [ -n "$sln" ]; then
+            echo "Restoring solution: $sln"
+            dotnet restore "$sln"
+          else
+            echo "No .sln found, restoring all projects"
+            dotnet restore
+          fi
+
+      - name: Build (Release)
+        shell: bash
+        run: |
+          sln=$(ls -1 **/*.sln 2>/dev/null | head -n 1 || true)
+          if [ -n "$sln" ]; then
+            dotnet build "$sln" -c Release --no-restore
+          else
+            dotnet build -c Release --no-restore
+          fi
+
+      - name: Test with coverage
+        shell: bash
+        run: |
+          set -e
+          mkdir -p TestResults
+          sln=$(ls -1 **/*.sln 2>/dev/null | head -n 1 || true)
+          if [ -n "$sln" ]; then
+            dotnet test "$sln" -c Release --no-build \
+              --collect:"XPlat Code Coverage" \
+              --logger "trx;LogFileName=test_results.trx"
+          else
+            projs=$(git ls-files "*Tests/*.csproj" || true)
+            for p in $projs; do
+              echo "Testing $p"
+              dotnet test "$p" -c Release --no-build \
+                --collect:"XPlat Code Coverage" \
+                --logger "trx;LogFileName=$(basename $p)-results.trx"
+            done
+          fi
+
+      - name: Install ReportGenerator
+        run: dotnet tool install --global dotnet-reportgenerator-globaltool
+
+      - name: Create coverage report
+        shell: bash
+        run: |
+          export PATH="$PATH:$HOME/.dotnet/tools"
+          reportgenerator \
+            -reports:**/TestResults/**/coverage.cobertura.xml \
+            -targetdir:coverage \
+            -reporttypes:"HtmlInline;Cobertura;MarkdownSummary" \
+            -assemblyfilters:"${COV_ASSEMBLY_FILTER}"
+          echo "### Code Coverage Summary" >> $GITHUB_STEP_SUMMARY
+          cat coverage/Summary.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-html
+          path: coverage
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Upload test results (trx + coverage raw)
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            **/TestResults/**/*.trx
+            **/TestResults/**/coverage.cobertura.xml
+          if-no-files-found: warn
+          retention-days: 7
