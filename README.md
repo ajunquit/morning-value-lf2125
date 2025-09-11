@@ -22,12 +22,14 @@ apps/
       Morning.Value.Application/
       Morning.Value.Infrastructure/
     test/
-      Morning.Value.Domain.Tests/
-      Morning.Value.Application.Tests/
-      Morning.Value.Infrastructure.Tests/
+      Morning.Value.Domain.Test/
+      Morning.Value.Application.Test/
+      Morning.Value.Infrastructure.Test/
   frontend/
     src/
       Morning.Value.Web.Site/        <-- UI MVC (.NET 8)
+    test/
+      Morning.Value.Web.Site.Test/
 ```
 
 ---
