@@ -35,8 +35,6 @@ apps/
 ## Requisitos
 
 - **.NET SDK 8.0**
-- **SQL Server** (local o en contenedor)
-- (Opcional) **Docker** y **Docker Compose**
 - (Opcional) **EF Core Tools**: `dotnet tool install -g dotnet-ef`
 
 ---
@@ -69,36 +67,7 @@ dotnet build
 dotnet ef database update   --project apps/backend/src/Morning.Value.Infrastructure   --startup-project apps/frontend/src/Morning.Value.Web.Site
 ```
 
-### Opción B: SQL Server en Docker
-
-`docker-compose.yml` mínimo:
-
-```yaml
-services:
-  db:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    environment:
-      ACCEPT_EULA: "Y"
-      SA_PASSWORD: "Your_strong_Passw0rd"
-    ports:
-      - "1433:1433"
-    volumes:
-      - sql-data:/var/opt/mssql
-volumes:
-  sql-data:
-```
-
-Levanta la BD:
-
-```bash
-docker compose up -d
-```
-
-Configura la cadena de conexión igual que en la opción A (Server=localhost,1433).
-
----
-
-## Ejecución (sin Docker)
+## Ejecución
 
 ```bash
 dotnet restore
@@ -112,25 +81,6 @@ dotnet run --project apps/frontend/src/Morning.Value.Web.Site
 - Ruta de inicio de sesión: `/auth/signin`
 
 > La app usa **cookies** y política de autorización global: si no estás autenticado, te redirige a `/auth/signin`.
-
----
-
-## Ejecución con Docker (solo Web)
-
-> Útil cuando ya tienes SQL Server local corriendo.
-
-Build & run:
-
-```bash
-# Build de la imagen del sitio
-docker build -t mv-frontend   -f apps/frontend/src/Morning.Value.Web.Site/Dockerfile .
-
-# Ejecutar (apunta a tu SQL local)
-docker run --rm -it -p 8080:8080   -e ASPNETCORE_ENVIRONMENT=Development   -e ASPNETCORE_URLS=http://+:8080   -e "ConnectionStrings__DefaultConnection=Server=host.docker.internal,1433;Database=MorningValue;User Id=sa;Password=Your_strong_Passw0rd;TrustServerCertificate=true;MultipleActiveResultSets=true"   mv-frontend
-```
-
-- UI: `http://localhost:8080`
-- Nota: `host.docker.internal` permite que el contenedor alcance tu SQL Server del host.
 
 ---
 
@@ -182,6 +132,42 @@ dotnet test apps/backend/test/Morning.Value.Infrastructure.Tests
   - En dev sirve por HTTP: `ASPNETCORE_URLS=http://+:8080`.
 - **Migraciones**:
   - Asegúrate de ejecutar `dotnet ef database update` con `--startup-project` apuntando al **Web.Site**.
+
+---
+
+## Usuario administrador (seed)
+
+Para contar con un **usuario Admin** inicial, ejecuta el siguiente script SQL sobre la base de datos **MorningValue** (por ejemplo con SQL Server Management Studio o `sqlcmd`).
+
+> Este usuario podrá ingresar al sistema con el correo y clave indicados abajo.  
+> **Importante:** el hash de contraseña corresponde a la clave `admin123`. Si cambias el algoritmo de hash, actualiza este valor.
+
+```sql
+INSERT INTO [dbo].[Users]
+           ([Id]
+           ,[Name]
+           ,[Email]
+           ,[PasswordHash]
+           ,[Role]
+           ,[CreatedAtUtc]
+           ,[CreatedBy]
+           ,[ModifiedAtUtc]
+           ,[ModifiedBy])
+     VALUES
+           ('BFE0136B-0790-4969-9D2C-08DDF129FE59'
+           ,'Administrador'
+           ,'root@domain.com'
+           ,'AQAAAAIAAYagAAAAEAoAwF2aNxwwshXq7xK5EG2yvxDAOAIeg5XAePz4hvWNvLLpcQXALFlsR85qSE5nzA=='
+           ,1
+           ,'2025-09-11'
+           ,'SYSTEM_USER'
+           ,NULL
+           ,NULL);
+```
+
+**Credenciales**
+- **Email:** `root@domain.com`
+- **Contraseña:** `admin123`
 
 ---
 
