@@ -108,7 +108,6 @@ namespace Morning.Value.Web.Site.Books.Controllers
             );
 
             TempData["ok"] = "Libro creado correctamente.";
-            // Preservar filtros actuales
             return RedirectToAction(nameof(Management), new { q = Request.Query["q"], page = Request.Query["page"], pageSize = Request.Query["pageSize"] });
         }
     }

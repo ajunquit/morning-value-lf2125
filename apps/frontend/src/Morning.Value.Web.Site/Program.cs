@@ -4,8 +4,6 @@ using Morning.Value.Application;
 using Morning.Value.Application.Common.Services;
 using Morning.Value.Infrastructure;
 using Morning.Value.Web.Site.Auth.Services;
-using Morning.Value.Web.Site.Books;
-using Morning.Value.Web.Site.Loans;
 
 var builder = WebApplication.CreateBuilder(args);
 
