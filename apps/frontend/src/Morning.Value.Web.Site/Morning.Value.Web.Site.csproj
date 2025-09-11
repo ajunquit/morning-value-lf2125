@@ -14,4 +14,9 @@
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\backend\src\Morning.Value.Application\Morning.Value.Application.csproj" />
+    <ProjectReference Include="..\..\..\backend\src\Morning.Value.Infrastructure\Morning.Value.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>
