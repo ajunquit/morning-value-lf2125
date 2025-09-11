@@ -14,9 +14,15 @@ namespace Morning.Value.Web.Site.Books.Controllers
             _logger = logger;
         }
         // GET: BookController
-        public IActionResult Index()
+        [Authorize(Roles = "Admin")]
+        public IActionResult Management()
         {
-            return View("~/Books/Views/Index.cshtml");
+            return View("~/Books/Views/Management.cshtml");
+        }
+        [Authorize(Roles = "Reader")]
+        public IActionResult History()
+        {
+            return View("~/Books/Views/History.cshtml");
         }
 
         // GET: BookController/Details/5

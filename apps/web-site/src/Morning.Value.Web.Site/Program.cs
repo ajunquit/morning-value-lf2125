@@ -13,7 +13,7 @@ builder.Services
     {
         options.LoginPath = "/auth/signin";
         options.LogoutPath = "/auth/signout";
-        //options.AccessDeniedPath = "/auth/denied";
+        options.AccessDeniedPath = "/auth/denied";
         options.Cookie.Name = "mv.auth";
         options.SlidingExpiration = true;
         options.ExpireTimeSpan = TimeSpan.FromHours(8);
@@ -25,6 +25,9 @@ builder.Services.AddAuthorization(options =>
     options.FallbackPolicy = new AuthorizationPolicyBuilder()
         .RequireAuthenticatedUser()
         .Build();
+
+    options.AddPolicy("AdminOnly", p => p.RequireRole("Admin"));
+    options.AddPolicy("ReaderOnly", p => p.RequireRole("Reader"));
 });
 
 var app = builder.Build();

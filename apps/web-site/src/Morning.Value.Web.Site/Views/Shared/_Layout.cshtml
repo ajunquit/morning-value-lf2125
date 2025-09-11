@@ -13,22 +13,31 @@
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Morning.Value.Web.Site</a>
+
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
                 @if (User.Identity?.IsAuthenticated ?? false)
                 {
+                    <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                        <ul class="navbar-nav flex-grow-1">
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Books" asp-action="Management">Book Management</a>
+                                </li>
+                            }
+
+                            @if (User.IsInRole("Reader"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Books" asp-action="History">Book History</a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+
                     <form asp-controller="Auth" asp-action="SignOut" method="post" class="d-inline">
                         <button class="btn btn-link nav-link" type="submit">Cerrar sesión (@User.Identity.Name)</button>
                     </form>
@@ -38,7 +47,6 @@
                     <a class="nav-link" asp-controller="Auth" asp-action="SignIn">Iniciar sesión</a>
                     <a class="nav-link" asp-controller="Auth" asp-action="SignUp">Registrarse</a>
                 }
-
             </div>
         </nav>
     </header>

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Morning.Value.Web.Site.Auth.Models;
+using System.Data;
 using System.Security.Claims;
 
 namespace Morning.Value.Web.Site.Auth.Controllers
@@ -39,13 +40,15 @@ namespace Morning.Value.Web.Site.Auth.Controllers
                 return View(model);
             }
 
+            bool isAdminFake = model.Email.Contains("admin");
+
             // 1) Claims del usuario
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, "123"),        // id de tu usuario
-                new Claim(ClaimTypes.Name, "Alejo"),                // nombre
-                new Claim(ClaimTypes.Email, model.Email)            // email
-                // puedes añadir roles/otros claims si quieres
+                new Claim(ClaimTypes.Name, isAdminFake ? "Admin":"Reader"),                // nombre
+                new Claim(ClaimTypes.Email, model.Email),           // email
+                new Claim(ClaimTypes.Role, isAdminFake ? "Admin":"Reader")                // rol
             };
 
             // 2) Construir principal + propiedades (persistente si RememberMe)
@@ -62,7 +65,7 @@ namespace Morning.Value.Web.Site.Auth.Controllers
             // 4) Redirigir a returnUrl local o al Home (Books/Index si quieres)
             if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
                 return Redirect(returnUrl);
-            return RedirectToAction("Index", "Books"); // o donde quieras entrar
+            return RedirectToAction(isAdminFake? "Management": "History", "Books"); // o donde quieras entrar
         }
 
         [HttpGet, AllowAnonymous]
