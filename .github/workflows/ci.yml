@@ -74,15 +74,18 @@ jobs:
             dotnet build -c Release --no-restore
           fi
 
-      - name: Test with coverage (all *Tests projects)
+      # Detecta *.Test.csproj y *.Tests.csproj (case-insensitive) y ejecuta cobertura
+      - name: Test with coverage (detect *.Test*.csproj)
         shell: bash
         run: |
           set -e
           mkdir -p artifacts/test
-          # Busca *Tests/*.csproj y **/*.Tests.csproj
-          projs=$(git ls-files "*Tests/*.csproj" "**/*.Tests.csproj" 2>/dev/null || true)
+          echo "Buscando proyectos de pruebas (*.Test.csproj | *.Tests.csproj)..."
+          projs=$(git ls-files "**/*.csproj" | grep -Ei "(\.Test|\.Tests)\.csproj$" || true)
           if [ -z "$projs" ]; then
-            echo "No se encontraron proyectos de pruebas (*Tests/*.csproj)."
+            echo "No se encontraron proyectos de pruebas."
+            echo "Diagnóstico (lista de .csproj encontrados):"
+            git ls-files "**/*.csproj" || true
             exit 1
           fi
           for p in $projs; do
@@ -103,7 +106,6 @@ jobs:
         shell: bash
         run: |
           export PATH="$PATH:$HOME/.dotnet/tools"
-          # Genera reporte desde el directorio de resultados que fijamos arriba
           reportgenerator \
             -reports:"artifacts/test/**/coverage.cobertura.xml" \
             -targetdir:"coverage" \
@@ -125,7 +127,7 @@ jobs:
         with:
           name: test-results
           path: |
-            **/TestResults/**/*.trx
-            **/TestResults/**/coverage.cobertura.xml
+            artifacts/test/**/*.trx
+            artifacts/test/**/coverage.cobertura.xml
           if-no-files-found: warn
           retention-days: 7
