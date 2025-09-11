@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Morning.Value.Domain.Book.Interface;
+using Morning.Value.Domain.Book.Interfaces;
 using Morning.Value.Domain.Books.Entity;
 using Morning.Value.Infrastructure.Persistences.Contexts;
 

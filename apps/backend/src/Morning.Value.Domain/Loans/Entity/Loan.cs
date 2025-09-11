@@ -6,8 +6,8 @@ namespace Morning.Value.Domain.Loans.Entity
 {
     public class Loan: AuditableEntity
     {
-        public int UserId { get; private set; }
-        public int BookId { get; private set; }
+        public Guid UserId { get; private set; }
+        public Guid BookId { get; private set; }
 
         public DateTime LoanDateUtc { get; private set; }
         public DateTime? ReturnDateUtc { get; private set; }
@@ -16,10 +16,10 @@ namespace Morning.Value.Domain.Loans.Entity
 
         private Loan() { } // EF
 
-        public static Loan Create(int userId, int bookId, DateTime? whenUtc = null)
+        public static Loan Create(Guid userId, Guid bookId, DateTime? whenUtc = null)
         {
-            if (userId <= 0) throw new DomainException("UserId inválido.");
-            if (bookId <= 0) throw new DomainException("BookId inválido.");
+            if (userId == Guid.Empty) throw new DomainException("UserId inválido.");
+            if (bookId == Guid.Empty) throw new DomainException("BookId inválido.");
 
             return new Loan
             {

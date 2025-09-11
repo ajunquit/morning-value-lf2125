@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Morning.Value.Domain.Book.Interface;
+using Morning.Value.Domain.Book.Interfaces;
 using Morning.Value.Domain.Common.Interfaces;
+using Morning.Value.Domain.Loans.Interfaces;
 using Morning.Value.Infrastructure.Persistences.Contexts;
 using Morning.Value.Infrastructure.Persistences.Interceptors;
 using Morning.Value.Infrastructure.Repositories;
@@ -46,6 +47,7 @@ namespace Morning.Value.Infrastructure
         {
             services.AddScoped<IUnitOfWorkAsync, UnitOfWorkAsync>();
             services.AddScoped<IBookRepositoryAsync, BookRepositoryAsync>();
+            services.AddScoped<ILoanRepositoryAsync, LoanRepositoryAsync>();
         }
     }
 }

@@ -1,16 +1,20 @@
-﻿using Morning.Value.Domain.Book.Interface;
+﻿using Morning.Value.Domain.Book.Interfaces;
 using Morning.Value.Domain.Common.Interfaces;
+using Morning.Value.Domain.Loans.Interfaces;
 using Morning.Value.Infrastructure.Persistences.Contexts;
 
 namespace Morning.Value.Infrastructure.Repositories
 {
     public class UnitOfWorkAsync(
+        ILoanRepositoryAsync loanRepository,
         IBookRepositoryAsync bookRepository,
         AppDbContext appDbContext) : IUnitOfWorkAsync, IDisposable
     {
         private readonly AppDbContext _appDbContext = appDbContext;
 
         public IBookRepositoryAsync BookRepository { get; } = bookRepository;
+
+        public ILoanRepositoryAsync LoanRepository { get; } = loanRepository;
 
         public void Dispose()
         {

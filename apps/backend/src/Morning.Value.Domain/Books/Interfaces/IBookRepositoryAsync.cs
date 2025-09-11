@@ -1,6 +1,6 @@
 ﻿using Morning.Value.Domain.Common.Interfaces;
 
-namespace Morning.Value.Domain.Book.Interface
+namespace Morning.Value.Domain.Book.Interfaces
 {
     public interface IBookRepositoryAsync: IRepositoryAsync<Books.Entity.Book>
     {

@@ -25,7 +25,7 @@ namespace Morning.Value.Web.Site.Auth.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             return View("~/Auth/Views/SignIn.cshtml", new SignInViewModel());
         }
-           
+
         [HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
         public async Task<IActionResult> SignIn(SignInViewModel model, string? returnUrl = null)
         {
@@ -41,11 +41,10 @@ namespace Morning.Value.Web.Site.Auth.Controllers
             }
 
             bool isAdminFake = model.Email.Contains("admin");
-
             // 1) Claims del usuario
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, "123"),        // id de tu usuario
+                new Claim(ClaimTypes.NameIdentifier,Guid.NewGuid().ToString()),        // id de tu usuario
                 new Claim(ClaimTypes.Name, isAdminFake ? "Admin":"Reader"),                // nombre
                 new Claim(ClaimTypes.Email, model.Email),           // email
                 new Claim(ClaimTypes.Role, isAdminFake ? "Admin":"Reader")                // rol
@@ -65,7 +64,7 @@ namespace Morning.Value.Web.Site.Auth.Controllers
             // 4) Redirigir a returnUrl local o al Home (Books/Index si quieres)
             if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
                 return Redirect(returnUrl);
-            return RedirectToAction(isAdminFake? "Management": "History", "Books"); // o donde quieras entrar
+            return RedirectToAction(isAdminFake ? "Management" : "History", "Books"); // o donde quieras entrar
         }
 
         [HttpGet, AllowAnonymous]

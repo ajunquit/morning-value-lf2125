@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Morning.Value.Application.Books.Services;
+using Morning.Value.Application.Loans.Services;
 
 namespace Morning.Value.Application
 {
@@ -17,6 +18,7 @@ namespace Morning.Value.Application
         private static void RegisterServices(IServiceCollection services)
         {
             services.AddScoped<IBookAppService, BookAppService>();
+            services.AddScoped<ILoanAppService, LoanAppService>();
         }
     }
 }
