@@ -74,25 +74,27 @@ jobs:
             dotnet build -c Release --no-restore
           fi
 
-      - name: Test with coverage
+      - name: Test with coverage (all *Tests projects)
         shell: bash
         run: |
           set -e
-          mkdir -p TestResults
-          sln=$(ls -1 **/*.sln 2>/dev/null | head -n 1 || true)
-          if [ -n "$sln" ]; then
-            dotnet test "$sln" -c Release --no-build \
-              --collect:"XPlat Code Coverage" \
-              --logger "trx;LogFileName=test_results.trx"
-          else
-            projs=$(git ls-files "*Tests/*.csproj" || true)
-            for p in $projs; do
-              echo "Testing $p"
-              dotnet test "$p" -c Release --no-build \
-                --collect:"XPlat Code Coverage" \
-                --logger "trx;LogFileName=$(basename $p)-results.trx"
-            done
+          mkdir -p artifacts/test
+          # Busca *Tests/*.csproj y **/*.Tests.csproj
+          projs=$(git ls-files "*Tests/*.csproj" "**/*.Tests.csproj" 2>/dev/null || true)
+          if [ -z "$projs" ]; then
+            echo "No se encontraron proyectos de pruebas (*Tests/*.csproj)."
+            exit 1
           fi
+          for p in $projs; do
+            name=$(basename "$p" .csproj)
+            out="artifacts/test/$name"
+            mkdir -p "$out"
+            echo ">> Ejecutando tests en $p"
+            dotnet test "$p" -c Release --no-build \
+              --results-directory "$out" \
+              --collect:"XPlat Code Coverage" \
+              --logger "trx;LogFileName=${name}.trx"
+          done
 
       - name: Install ReportGenerator
         run: dotnet tool install --global dotnet-reportgenerator-globaltool
@@ -101,11 +103,12 @@ jobs:
         shell: bash
         run: |
           export PATH="$PATH:$HOME/.dotnet/tools"
+          # Genera reporte desde el directorio de resultados que fijamos arriba
           reportgenerator \
-            -reports:**/TestResults/**/coverage.cobertura.xml \
-            -targetdir:coverage \
+            -reports:"artifacts/test/**/coverage.cobertura.xml" \
+            -targetdir:"coverage" \
             -reporttypes:"HtmlInline;Cobertura;MarkdownSummary" \
-            -assemblyfilters:"${COV_ASSEMBLY_FILTER}"
+            -assemblyfilters:"+Morning.Value.*"
           echo "### Code Coverage Summary" >> $GITHUB_STEP_SUMMARY
           cat coverage/Summary.md >> $GITHUB_STEP_SUMMARY
 
