@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Morning.Value.Application;
+using Morning.Value.Application.Common.Services;
 using Morning.Value.Infrastructure;
+using Morning.Value.Web.Site.Auth.Services;
 using Morning.Value.Web.Site.Books;
 using Morning.Value.Web.Site.Loans;
 
@@ -42,6 +44,8 @@ builder.Services.AddScoped<ILoanRepository, InMemoryLoanRepository>();
 builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddScoped<LibraryService>();
 
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 

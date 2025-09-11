@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Morning.Value.Application.Books.Services;
 using Morning.Value.Web.Site.Books.Models;
 using Morning.Value.Web.Site.Common.Models;
 using Morning.Value.Web.Site.Home.Controllers;
@@ -14,14 +15,17 @@ namespace Morning.Value.Web.Site.Books.Controllers
     public class BooksController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IBookAppService _bookAppService;
         private readonly ILoanRepository _loans;
         private readonly IBookRepository _books;
 
         public BooksController(ILogger<HomeController> logger,
+            IBookAppService bookAppService,
             ILoanRepository loans,
             IBookRepository books)
         {
             _logger = logger;
+            _bookAppService = bookAppService;
             _loans = loans;
             _books = books;
         }
@@ -76,7 +80,7 @@ namespace Morning.Value.Web.Site.Books.Controllers
         [HttpPost]
         [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(BookCreateViewModel model)
+        public async Task<IActionResult> Create([Bind(Prefix = "Create")] BookCreateViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -99,7 +103,7 @@ namespace Morning.Value.Web.Site.Books.Controllers
                 return View("~/Books/Views/Management.cshtml", vm);
             }
 
-            await _books.CreateAsync(
+            await _bookAppService.CreateAsync(
                 title: model.Title,
                 author: model.Author,
                 genre: model.Genre,

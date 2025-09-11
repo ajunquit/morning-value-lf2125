@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Morning.Value.Domain.Book.Interface;
 using Morning.Value.Domain.Common.Interfaces;
 using Morning.Value.Infrastructure.Persistences.Contexts;
+using Morning.Value.Infrastructure.Persistences.Interceptors;
 using Morning.Value.Infrastructure.Repositories;
 
 namespace Morning.Value.Infrastructure
@@ -26,12 +27,18 @@ namespace Morning.Value.Infrastructure
 
         private static void RegisterAppDbContext(IServiceCollection services, IConfiguration configuration)
         {
-            services.AddDbContext<IAppDbContext, AppDbContext>(options =>
+            services.AddScoped<AuditingSaveChangesInterceptor>();
+            services.AddDbContext<IAppDbContext, AppDbContext>((sp, options) =>
+            {
                 options.UseSqlServer(
                     configuration.GetConnectionString("Local"),
                     sqlOptions =>
                         sqlOptions.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)
-                )
+                );
+
+                options.AddInterceptors(sp.GetRequiredService<AuditingSaveChangesInterceptor>());
+            }
+                
             );
         }
 
