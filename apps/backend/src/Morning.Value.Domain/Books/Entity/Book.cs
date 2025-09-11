@@ -14,10 +14,18 @@ namespace Morning.Value.Domain.Books.Entity
 
         public Book(string title, string author, string genre, int availableCopies)
         {
+            SetId(Guid.NewGuid());
             SetTitle(title);
             SetAuthor(author);
             SetGenre(genre);
             SetAvailableCopies(availableCopies);
+        }
+
+        public void SetId(Guid id)
+        {
+            if (id == Guid.Empty)
+                Id = Guid.NewGuid();
+            Id = id;
         }
 
         public void SetTitle(string title)
