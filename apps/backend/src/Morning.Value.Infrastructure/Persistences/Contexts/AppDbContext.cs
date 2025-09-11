@@ -8,9 +8,9 @@ namespace Morning.Value.Infrastructure.Persistences.Contexts
 {
     public class AppDbContext : DbContext, IAppDbContext
     {
-        public DbSet<Book> Books { get; set; }
-        public DbSet<Loan> Loans { get; set; }
-        public DbSet<User> Users { get; set; }
+        public DbSet<Book> Books => Set<Book>();
+        public DbSet<Loan> Loans => Set<Loan>();
+        public DbSet<User> Users => Set<User>();
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }

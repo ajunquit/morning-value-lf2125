@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Morning.Value.Domain.Common.Interfaces;
 using Morning.Value.Infrastructure.Persistences.Contexts;
+using System.Collections.Generic;
+using System.Linq.Expressions;
 
 namespace Morning.Value.Infrastructure.Repositories
 {
@@ -62,5 +64,8 @@ namespace Morning.Value.Infrastructure.Repositories
             _entities.Update(entity);
             return await Task.FromResult(true);
         }
+
+        protected IQueryable<T> Query(Expression<Func<T, bool>> predicate)
+            => _entities.Where(predicate);
     }
 }
