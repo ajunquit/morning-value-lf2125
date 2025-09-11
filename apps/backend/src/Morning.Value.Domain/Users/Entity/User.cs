@@ -37,7 +37,7 @@ namespace Morning.Value.Domain.Users.Entity
         public void SetPasswordHash(string hash)
         {
             if (string.IsNullOrWhiteSpace(hash)) throw new DomainException("Password hash inválido.");
-            PasswordHash = hash;
+            PasswordHash = hash.Trim();
         }
 
         public void SetRole(RoleType role) => Role = role;
