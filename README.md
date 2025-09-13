@@ -4,10 +4,6 @@
 
 Sistema de gestión de biblioteca (ASP.NET Core MVC + **Clean Architecture**) con autenticación por **cookies**, roles **Admin / Reader**, préstamos y devoluciones, historial con filtros/paginación y administración de libros.
 
-> ⚠️ No usar credenciales reales ni exponerlo directamente a producción.
-
-
-
 ## Tabla de contenidos
 
 * [Características](#características)
