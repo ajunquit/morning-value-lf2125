@@ -23,7 +23,6 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: "Development"
       ASPNETCORE_URLS: "http://+:8080"
-      # Usa la clave que tenga tu appsettings.json:
       ConnectionStrings__Local: "Server=db;Database=MorningValue;User ID=sa;Password=Admin_sa1!;Encrypt=True;TrustServerCertificate=True"
     depends_on:
       db:

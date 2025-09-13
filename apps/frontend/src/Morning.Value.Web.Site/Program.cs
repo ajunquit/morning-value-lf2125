@@ -13,7 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// 1) Cookie Auth
+// Cookie Auth
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -26,7 +26,7 @@ builder.Services
         options.ExpireTimeSpan = TimeSpan.FromHours(8);
     });
 
-// 2) Política global: TODO requiere estar autenticado
+// Política global: TODO requiere estar autenticado
 builder.Services.AddAuthorization(options =>
 {
     options.FallbackPolicy = new AuthorizationPolicyBuilder()
@@ -67,7 +67,7 @@ if (app.Environment.IsDevelopment())
     catch (Exception ex)
     {
         app.Logger.LogError(ex, "Error applying EF Core migrations");
-        throw; // o quita el throw si prefieres que la app siga
+        throw;
     }
 }
 
@@ -76,18 +76,15 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-// *** Importante: primero Authentication, luego Authorization
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Ruta explícita para la raíz "/"
 app.MapControllerRoute(
     name: "root",
     pattern: "",
     defaults: new { controller = "Home", action = "Index" }
 );
 
-// Ruta por defecto del resto
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
