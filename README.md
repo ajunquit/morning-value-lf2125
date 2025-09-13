@@ -1,17 +1,12 @@
 # README.md — Morning.Value LF2125
 
-> **Nota:** Reemplaza `<OWNER>/<REPO>` por el dueño y nombre reales de tu repositorio en GitHub.
-
-[![CI](https://github.com/<OWNER>/<REPO>/actions/workflows/ci.yml/badge.svg)](https://github.com/<OWNER>/<REPO>/actions/workflows/ci.yml)
-![demo-educativo](https://img.shields.io/badge/demo-educativo-informational)
-
 # Morning.Value LF2125
 
-Sistema **demo** de gestión de biblioteca (ASP.NET Core MVC + **Clean Architecture**) con autenticación por **cookies**, roles **Admin / Reader**, préstamos y devoluciones, historial con filtros/paginación y administración de libros.
+Sistema de gestión de biblioteca (ASP.NET Core MVC + **Clean Architecture**) con autenticación por **cookies**, roles **Admin / Reader**, préstamos y devoluciones, historial con filtros/paginación y administración de libros.
 
-> ⚠️ Proyecto con fines **educativos**. No usar credenciales reales ni exponerlo directamente a producción.
+> ⚠️ No usar credenciales reales ni exponerlo directamente a producción.
 
----
+
 
 ## Tabla de contenidos
 
@@ -36,7 +31,7 @@ Sistema **demo** de gestión de biblioteca (ASP.NET Core MVC + **Clean Architect
 * [FAQ / Problemas comunes](#faq--problemas-comunes)
 * [Licencia](#licencia)
 
----
+
 
 ## Características
 
@@ -54,7 +49,7 @@ Sistema **demo** de gestión de biblioteca (ASP.NET Core MVC + **Clean Architect
   * Alta/consulta de libros (modal).
   * Préstamos y devoluciones con historial filtrable y paginado.
 
----
+
 
 ## Arquitectura y Estructura
 
@@ -83,9 +78,9 @@ apps/
 * **Infrastructure**: EF Core (DbContext, UoW, repos), hashing, interceptor de auditoría, **seeding**.
 * **Web.Site**: Controladores MVC, Vistas (Razor + Bootstrap), ViewModels.
 
----
 
-## Tecn stack
+
+## Tech stack
 
 * **Frontend:** ASP.NET Core **MVC** (Bootstrap 5)
 * **Backend:** .NET **8**, Clean Architecture, **EF Core** (SQL Server)
@@ -93,7 +88,7 @@ apps/
 * **CI:** GitHub Actions (restore, build, test, cobertura y cache de NuGet)
 * **Contenedores:** Docker & Docker Compose
 
----
+
 
 ## Requisitos
 
@@ -101,7 +96,7 @@ apps/
 * **SQL Server** (local, container o remoto)
 * **Docker & Docker Compose** (opcional, para levantar stack completo)
 
----
+
 
 ## Configuración
 
@@ -135,7 +130,7 @@ apps/
 * `ASPNETCORE_ENVIRONMENT` = `Development` | `Production`
 * `ConnectionStrings__Default` = *cadena de conexión completa* (sobrescribe `appsettings.json`)
 
----
+
 
 ## Ejecución
 
@@ -169,7 +164,7 @@ apps/
    * **DB**: `localhost:1443` (conéctate como `localhost,1443`)
    * **Web**: `http://localhost:8080`
 
----
+
 
 ## Migraciones y Seeding
 
@@ -192,7 +187,7 @@ apps/
 
 * **Seeding**: en el primer arranque se crean usuarios **Admin** y **Reader** y datos mínimos de prueba.
 
----
+
 
 ## Rutas principales
 
@@ -215,7 +210,7 @@ apps/
   * `POST /loans/borrow` – pedir prestado
   * `POST /loans/return` – devolver
 
----
+
 
 ## Roles y credenciales de ejemplo
 
@@ -226,7 +221,7 @@ apps/
 | Admin  | `admin@domain.com`  | `admin123`  | Gestión de libros (alta/consulta)              |
 | Reader | `reader@domain.com` | `reader123` | Home lector, préstamos/devoluciones, historial |
 
----
+
 
 ## Pruebas y Cobertura
 
@@ -248,7 +243,7 @@ dotnet test -c Release --collect:"XPlat Code Coverage"
   # abre coverage-html/index.html
   ```
 
----
+
 
 ## CI (GitHub Actions)
 
@@ -267,7 +262,7 @@ Workflow en `.github/workflows/ci.yml` (por push/PR a `main`):
 
 > Si agregas CD, puedes extender este pipeline para publicar imágenes/container o paquetes.
 
----
+
 
 ## Capturas (Anexos)
 
@@ -299,7 +294,7 @@ Workflow en `.github/workflows/ci.yml` (por push/PR a `main`):
 
 **Artefactos generados** <img width="907" height="259" alt="image" src="https://github.com/user-attachments/assets/f1cfab38-4445-44d1-98e2-fbc5fd956131" />
 
----
+
 
 ## FAQ / Problemas comunes
 
@@ -312,43 +307,7 @@ Workflow en `.github/workflows/ci.yml` (por push/PR a `main`):
 * **Migración fallida**
   Asegúrate de ejecutar `dotnet ef` con `--project` (Infrastructure) y `--startup-project` (Web.Site).
 
----
 
 ## Licencia
 
 **Uso educativo / demo.** Puedes adaptar este código con fines de aprendizaje y pruebas.
-
----
-
----
-
-# PR.md — Descripción de Pull Request (plantilla)
-
-**Título sugerido:** `docs: refresh README con TOC, Quick Start, migraciones/seed y badge de CI`
-
-## Resumen
-
-Actualiza `README.md` para mejorar onboarding y documentación:
-
-* TOC y secciones de *Quick Start* (local y Docker)
-* Guía de cadenas de conexión (SQL Auth vs Trusted Connection)
-* Migraciones EF Core + seeding
-* Rutas, roles y credenciales de demo
-* Pruebas con cobertura y pipeline de CI (badge de Actions)
-* Capturas ordenadas por secciones
-
-## Cambios
-
-* `README.md`: reescrito y reorganizado
-* **Badge**: agrega estado de CI usando `actions/workflows/ci.yml`
-
-## Checklist
-
-* [ ] Reemplacé `<OWNER>/<REPO>` por los valores reales
-* [ ] Validé que el workflow `ci.yml` existe y el badge carga
-* [ ] Probé `docker compose up -d --build` y verifiqué web/DB
-* [ ] Ejecuté `dotnet test` y confirmé cobertura generada
-
-## Evidencia
-
-> (Opcional) Inserta capturas del Job Summary, artefactos y pantallas principales.
