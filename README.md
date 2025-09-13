@@ -12,7 +12,7 @@ Sistema de gestión de biblioteca (ASP.NET Core MVC + **Clean Architecture**) co
 
 * [Características](#características)
 * [Arquitectura y Estructura](#arquitectura-y-estructura)
-* [Tecn stack](#tecn-stack)
+* [Teck stack](#tecn-stack)
 * [Requisitos](#requisitos)
 * [Configuración](#configuración)
 
@@ -260,10 +260,6 @@ Workflow en `.github/workflows/ci.yml` (por push/PR a `main`):
   * `coverage-html` (HTML + Cobertura + resumen Markdown)
   * `test-results` (`.trx` y `coverage.cobertura.xml`)
 
-> Si agregas CD, puedes extender este pipeline para publicar imágenes/container o paquetes.
-
-
-
 ## Capturas (Anexos)
 
 ### Pantallas Compartidas
@@ -302,8 +298,6 @@ Workflow en `.github/workflows/ci.yml` (por push/PR a `main`):
   Verifica el *map* de puertos del container (`1443:1433`) y conecta con `Server=localhost,1443`.
 * **SSL/Certificado en dev**
   Usa `Encrypt=True;TrustServerCertificate=True` para evitar errores de certificado en entorno local.
-* **Conflicto en cadena de conexión**
-  No mezcles `User Id/Password` con `Trusted_Connection=True`. Elige **uno**.
 * **Migración fallida**
   Asegúrate de ejecutar `dotnet ef` con `--project` (Infrastructure) y `--startup-project` (Web.Site).
 
