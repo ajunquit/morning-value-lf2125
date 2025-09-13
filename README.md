@@ -124,7 +124,7 @@ apps/
 ### Variables de entorno (opcional)
 
 * `ASPNETCORE_ENVIRONMENT` = `Development` | `Production`
-* `ConnectionStrings__Default` = *cadena de conexión completa* (sobrescribe `appsettings.json`)
+* `ConnectionStrings__Local` = *cadena de conexión completa* (sobrescribe `appsettings.json`)
 
 
 
