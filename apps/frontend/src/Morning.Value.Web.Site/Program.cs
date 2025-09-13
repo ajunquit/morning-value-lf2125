@@ -1,8 +1,11 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using Morning.Value.Application;
 using Morning.Value.Application.Common.Services;
 using Morning.Value.Infrastructure;
+using Morning.Value.Infrastructure.Persistences.Contexts;
+using Morning.Value.Infrastructure.Persistences.Seed;
 using Morning.Value.Web.Site.Auth.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -49,6 +52,23 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
+}
+
+if (app.Environment.IsDevelopment())
+{
+    try
+    {
+        using var scope = app.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var hasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
+        await db.Database.MigrateAsync();
+        await SeedData.SeedInitialDataAsync(db, hasher);
+    }
+    catch (Exception ex)
+    {
+        app.Logger.LogError(ex, "Error applying EF Core migrations");
+        throw; // o quita el throw si prefieres que la app siga
+    }
 }
 
 app.UseHttpsRedirection();
