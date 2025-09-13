@@ -106,7 +106,7 @@ apps/
 ```json
 {
   "ConnectionStrings": {
-    "Default": "Server=localhost,1443;Database=MorningValue;User Id=sa;Password=Admin_sa1!;Encrypt=True;TrustServerCertificate=True;MultipleActiveResultSets=True"
+    "Local": "Server=localhost,1443;Database=MorningValue;User Id=sa;Password=Admin_sa1!;Encrypt=True;TrustServerCertificate=True;MultipleActiveResultSets=True"
   }
 }
 ```
@@ -116,7 +116,7 @@ apps/
 ```json
 {
   "ConnectionStrings": {
-    "Default": "Server=(localdb)\\MSSQLLocalDB;Database=MorningValue;Trusted_Connection=True;MultipleActiveResultSets=True"
+    "Local": "Server=(localdb)\\MSSQLLocalDB;Database=MorningValue;Trusted_Connection=True;MultipleActiveResultSets=True"
   }
 }
 ```
