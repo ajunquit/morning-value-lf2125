@@ -1,5 +1,3 @@
-# README.md — Morning.Value LF2125
-
 # Morning.Value LF2125
 
 Sistema de gestión de biblioteca (ASP.NET Core MVC + **Clean Architecture**) con autenticación por **cookies**, roles **Admin / Reader**, préstamos y devoluciones, historial con filtros/paginación y administración de libros.
