@@ -6,7 +6,7 @@ Sistema de gestión de biblioteca (ASP.NET Core MVC + **Clean Architecture**) co
 
 * [Características](#características)
 * [Arquitectura y Estructura](#arquitectura-y-estructura)
-* [Teck stack](#tecn-stack)
+* [Tech stack](#tech-stack)
 * [Requisitos](#requisitos)
 * [Configuración](#configuración)
 
